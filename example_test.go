@@ -21,7 +21,7 @@ func Example() {
 	app.Localize(locales, language.English)
 
 	app.Route("/", func(c *app.Context) {
-		c.View("")
+		c.View("home")
 	})
 
 	app.Route("/user", func(c *app.Context) {
