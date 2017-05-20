@@ -18,11 +18,11 @@ var (
 	confI18n *configurationI18n
 
 	// ParseFormValue parses the LocaleFieldName form value.
-	ParseFormValue Parser = i18n.ParseFormValue
+	ParseFormValue = i18n.ParseFormValue
 	// ParseAcceptLanguage parses the Accept-Language header.
-	ParseAcceptLanguage Parser = i18n.ParseAcceptLanguage
+	ParseAcceptLanguage = i18n.ParseAcceptLanguage
 	// ParseCookie parses the LocaleFieldName cookie.
-	ParseCookie Parser = i18n.ParseCookie
+	ParseCookie = i18n.ParseCookie
 )
 
 // Locales is a map of locales and their translations.
@@ -32,7 +32,7 @@ type Locales map[language.Tag]Translations
 type Translations map[string]string
 
 // A Parser is a funcion that returns a list of accepted languages, most preferred first.
-type Parser i18n.Parser
+type Parser func(*http.Request) []language.Tag
 
 // Localize sets app locales with fallback and client locale parsers (order is mandatory and default are ParseFormValue, ParseAcceptLanguage).
 func Localize(locs Locales, fallback language.Tag, parsers ...Parser) {

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"html/template"
 	"log"
@@ -13,6 +14,16 @@ import (
 type Context struct {
 	Res http.ResponseWriter
 	Req *http.Request
+}
+
+// Get returns a context value.
+func (c *Context) Get(key interface{}) interface{} {
+	return c.Req.Context().Value(key)
+}
+
+// Set sets a context value.
+func (c *Context) Set(key, val interface{}) {
+	c.Req = c.Req.WithContext(context.WithValue(c.Req.Context(), key, val))
 }
 
 // FormValue gets the form value from the request.
