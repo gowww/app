@@ -20,6 +20,8 @@ var (
 )
 
 func init() {
+	flag.Parse()
+
 	// Serve static content
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
