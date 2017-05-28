@@ -50,6 +50,9 @@ func parseViews() {
 		"copyright": func(name string) string {
 			return fmt.Sprintf("© %s %d", name, time.Now().Year())
 		},
+		"envproduction": func(name string) bool {
+			return EnvProduction()
+		},
 	}).ParseGlob("views/*.gohtml"))
 }
 

@@ -1,6 +1,4 @@
-/*
-Package app provides a full featured framework for any web apps.
-*/
+// Package app provides a full featured framework for any web app.
 package app
 
 import (
