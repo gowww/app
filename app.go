@@ -13,9 +13,10 @@ import (
 )
 
 var (
-	address    = flag.String("a", ":8080", "the address to listen and serving on")
-	production = flag.Bool("p", false, "run the server in production environment")
-	rt         = router.New()
+	address      = flag.String("a", ":8080", "the address to listen and serving on")
+	production   = flag.Bool("p", false, "run the server in production environment")
+	rt           = router.New()
+	errorHandler Handler
 )
 
 func init() {
@@ -77,6 +78,14 @@ func NotFound(handler Handler) {
 		panic(`app: "not found" handler set multiple times`)
 	}
 	rt.NotFoundHandler = handler
+}
+
+// Error registers the "internal error" handler.
+func Error(handler Handler) {
+	if rt.NotFoundHandler != nil {
+		panic(`app: "internal error" handler set multiple times`)
+	}
+	errorHandler = handler
 }
 
 // EnvProduction tells if the app is run with the production flag.

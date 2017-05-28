@@ -122,13 +122,21 @@ func (c *Context) Fmtn(n interface{}) string {
 	return i18n.Fmtn(i18n.RequestTranslator(c.Req).Locale, n)
 }
 
-// NotFound only responds with a status.
+// NotFound responds with the "not found" handler.
 func (c *Context) NotFound() {
-	http.NotFound(c.Res, c.Req) // TODO: Send custom 404 template.
+	if rt.NotFoundHandler != nil {
+		rt.NotFoundHandler.ServeHTTP(c.Res, c.Req)
+	} else {
+		http.NotFound(c.Res, c.Req)
+	}
 }
 
+// Error responds logs error and response with the error handler.
 func (c *Context) Error(err error) {
 	log.Println(err)
-	c.Res.WriteHeader(http.StatusInternalServerError)
-	c.Res.Write([]byte(http.StatusText(http.StatusInternalServerError))) // TODO: Send custom 500 template.
+	if errorHandler != nil {
+		errorHandler.ServeHTTP(c.Res, c.Req)
+	} else {
+		http.Error(c.Res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }
