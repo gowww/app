@@ -99,8 +99,10 @@ func (c *Context) T(key string, a ...interface{}) string {
 	return i18n.RequestTranslator(c.Req).T(key, a...)
 }
 
-// Tn returns the translation associated to key, for the client locale. If the translation defines plural forms (zero, one, other), it uses the most appropriate.
-// All i18n.TnPlaceholder in the translation are replaced with number n. When translation is not found, an empty string is returned.
+// Tn returns the translation associated to key, for the client locale.
+// If the translation defines plural forms (zero, one, other), it uses the most appropriate.
+// All i18n.TnPlaceholder in the translation are replaced with number n.
+// When translation is not found, an empty string is returned.
 func (c *Context) Tn(key string, n interface{}, a ...interface{}) string {
 	return i18n.RequestTranslator(c.Req).Tn(key, n, a...)
 }
