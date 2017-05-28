@@ -9,19 +9,20 @@ import (
 	"path/filepath"
 
 	gowwwlog "github.com/gowww/log"
+	"github.com/gowww/router"
 )
 
 var (
 	address    = flag.String("a", ":8080", "the address to listen and serving on")
 	production = flag.Bool("p", false, "run the server in production environment")
-	mux        = http.NewServeMux()
+	rt         = router.New()
 )
 
 func init() {
 	flag.Parse()
 
 	// Serve static content
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	rt.Get("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// Parse views
 	files, _ := ioutil.ReadDir("views")
@@ -40,9 +41,42 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h(&Context{w, r})
 }
 
-// Route adds a new route to the muxer.
-func Route(pattern string, handler Handler) {
-	mux.Handle(pattern, handler)
+// Route makes a route for method and path.
+func Route(method, path string, handler Handler) {
+	rt.Handle(method, path, handler)
+}
+
+// Get makes a route for GET method.
+func Get(path string, handler Handler) {
+	rt.Get(path, handler)
+}
+
+// Post makes a route for POST method.
+func Post(path string, handler Handler) {
+	rt.Post(path, handler)
+}
+
+// Put makes a route for PUT method.
+func Put(path string, handler Handler) {
+	rt.Put(path, handler)
+}
+
+// Patch makes a route for PATCH method.
+func Patch(path string, handler Handler) {
+	rt.Patch(path, handler)
+}
+
+// Delete makes a route for DELETE method.
+func Delete(path string, handler Handler) {
+	rt.Delete(path, handler)
+}
+
+// NotFound registers the "not found" handler.
+func NotFound(handler Handler) {
+	if rt.NotFoundHandler != nil {
+		panic(`app: "not found" handler set multiple times`)
+	}
+	rt.NotFoundHandler = handler
 }
 
 // EnvProduction tells if the app is run with the production flag.
@@ -57,7 +91,7 @@ func Address() string {
 
 // Run starts the server.
 func Run() {
-	handler := http.Handler(mux)
+	handler := http.Handler(rt)
 	if confI18n != nil {
 		confI18n.handleI18n(&handler)
 	}

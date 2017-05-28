@@ -20,15 +20,15 @@ func Example() {
 
 	app.Localize(locales, language.English)
 
-	app.Route("/", func(c *app.Context) {
+	app.Get("/", func(c *app.Context) {
 		c.View("home")
 	})
 
-	app.Route("/user", func(c *app.Context) {
+	app.Post("/user/:id/files/", func(c *app.Context) {
 		c.Status(http.StatusCreated)
 		c.JSON(map[string]interface{}{
-			"id":   1,
-			"name": "White",
+			"id":       c.PathValue("id"),
+			"filepath": c.PathValue("*"),
 		})
 	})
 
