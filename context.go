@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gowww/i18n"
+	"github.com/gowww/router"
 )
 
 // A Context contains the data for a handler.
@@ -24,6 +25,11 @@ func (c *Context) Get(key interface{}) interface{} {
 // Set sets a context value.
 func (c *Context) Set(key, val interface{}) {
 	c.Req = c.Req.WithContext(context.WithValue(c.Req.Context(), key, val))
+}
+
+// PathValue returns the value of path parameter.
+func (c *Context) PathValue(key string) string {
+	return router.Parameter(c.Req, key)
 }
 
 // FormValue gets the form value from the request.
@@ -52,8 +58,8 @@ func (c *Context) Bytes(b []byte) {
 }
 
 // Status sets the HTTP status of the response.
-func (c *Context) Status(s int) {
-	c.Res.WriteHeader(s)
+func (c *Context) Status(code int) {
+	c.Res.WriteHeader(code)
 }
 
 // View writes a rendered view to the response.
@@ -83,6 +89,11 @@ func (c *Context) JSON(v interface{}) {
 	enc.Encode(v)
 }
 
+// Redirect redirects the client to the url with status code.
+func (c *Context) Redirect(url string, status int) {
+	http.Redirect(c.Res, c.Req, url, status)
+}
+
 // T returns the translation associated to key, for the client locale.
 func (c *Context) T(key string, a ...interface{}) string {
 	return i18n.RequestTranslator(c.Req).T(key, a...)
@@ -107,8 +118,6 @@ func (c *Context) TnHTML(key string, n interface{}, a ...interface{}) template.H
 func (c *Context) Fmtn(n interface{}) string {
 	return i18n.Fmtn(i18n.RequestTranslator(c.Req).Locale, n)
 }
-
-// TODO: JSON response func.
 
 // NotFound only responds with a status.
 func (c *Context) NotFound() {
