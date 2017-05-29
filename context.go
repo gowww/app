@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -50,6 +51,11 @@ func (c *Context) Write(b []byte) (int, error) {
 // Text writes a string to the response.
 func (c *Context) Text(s string) {
 	c.Write([]byte(s))
+}
+
+// Textf writes a formatted string to the response.
+func (c *Context) Textf(s string, a ...interface{}) {
+	fmt.Fprintf(c.Res, s, a...)
 }
 
 // Bytes writes a bytes slice to the response.
