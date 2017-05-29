@@ -48,17 +48,17 @@ func (c *Context) Write(b []byte) (int, error) {
 	return c.Res.Write(b)
 }
 
-// Text writes a string to the response.
+// Text writes the response with a string.
 func (c *Context) Text(s string) {
 	c.Write([]byte(s))
 }
 
-// Textf writes a formatted string to the response.
+// Textf writes the response with a formatted string.
 func (c *Context) Textf(s string, a ...interface{}) {
 	fmt.Fprintf(c.Res, s, a...)
 }
 
-// Bytes writes a bytes slice to the response.
+// Bytes writes the response with a bytes slice.
 func (c *Context) Bytes(b []byte) {
 	c.Write(b)
 }
@@ -68,7 +68,7 @@ func (c *Context) Status(code int) {
 	c.Res.WriteHeader(code)
 }
 
-// View writes a rendered view to the response.
+// View writes the response with a rendered view.
 // This data is always part of the rendering:
 //	.	the GlobalViewData
 //	.c	the Context
@@ -89,7 +89,7 @@ func (c *Context) View(name string, data ...ViewData) {
 	}
 }
 
-// JSON writes a marshalled JSON to the response.
+// JSON writes the response with a marshalled JSON.
 func (c *Context) JSON(v interface{}) {
 	enc := json.NewEncoder(c.Res)
 	enc.Encode(v)
