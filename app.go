@@ -49,27 +49,27 @@ func Route(method, path string, handler Handler) {
 
 // Get makes a route for GET method.
 func Get(path string, handler Handler) {
-	rt.Get(path, handler)
+	Route(http.MethodGet, path, handler)
 }
 
 // Post makes a route for POST method.
 func Post(path string, handler Handler) {
-	rt.Post(path, handler)
+	Route(http.MethodPost, path, handler)
 }
 
 // Put makes a route for PUT method.
 func Put(path string, handler Handler) {
-	rt.Put(path, handler)
+	Route(http.MethodPut, path, handler)
 }
 
 // Patch makes a route for PATCH method.
 func Patch(path string, handler Handler) {
-	rt.Patch(path, handler)
+	Route(http.MethodPatch, path, handler)
 }
 
 // Delete makes a route for DELETE method.
 func Delete(path string, handler Handler) {
-	rt.Delete(path, handler)
+	Route(http.MethodDelete, path, handler)
 }
 
 // NotFound registers the "not found" handler.
