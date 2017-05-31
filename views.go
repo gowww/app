@@ -40,7 +40,7 @@ func parseViews() {
 		"styles": viewFuncStyles,
 		"scripts": func(scripts ...string) (h template.HTML) {
 			for _, script := range scripts {
-				h += template.HTML(`<script src="` + script + `">`)
+				h += template.HTML(`<script src="` + script + `"></script>`)
 			}
 			return
 		},
