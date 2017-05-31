@@ -104,6 +104,7 @@ func Run() {
 	if confI18n != nil {
 		confI18n.handleI18n(&handler)
 	}
+	// TODO: Handle external middlewares.
 	if !*production {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}
