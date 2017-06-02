@@ -42,34 +42,45 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h(&Context{w, r})
 }
 
+// A Middleware is a handler that wraps another one.
+type Middleware func(http.Handler) http.Handler
+
+// wrapHandler returns handler h wrapped with middlewares mm.
+func wrapHandler(h http.Handler, mm ...Middleware) http.Handler {
+	for i := len(mm) - 1; i >= 0; i-- {
+		h = mm[i](h)
+	}
+	return h
+}
+
 // Route makes a route for method and path.
-func Route(method, path string, handler Handler) {
-	rt.Handle(method, path, handler)
+func Route(method, path string, handler Handler, middlewares ...Middleware) {
+	rt.Handle(method, path, wrapHandler(handler, middlewares...))
 }
 
 // Get makes a route for GET method.
-func Get(path string, handler Handler) {
-	Route(http.MethodGet, path, handler)
+func Get(path string, handler Handler, middlewares ...Middleware) {
+	Route(http.MethodGet, path, handler, middlewares...)
 }
 
 // Post makes a route for POST method.
-func Post(path string, handler Handler) {
-	Route(http.MethodPost, path, handler)
+func Post(path string, handler Handler, middlewares ...Middleware) {
+	Route(http.MethodPost, path, handler, middlewares...)
 }
 
 // Put makes a route for PUT method.
-func Put(path string, handler Handler) {
-	Route(http.MethodPut, path, handler)
+func Put(path string, handler Handler, middlewares ...Middleware) {
+	Route(http.MethodPut, path, handler, middlewares...)
 }
 
 // Patch makes a route for PATCH method.
-func Patch(path string, handler Handler) {
-	Route(http.MethodPatch, path, handler)
+func Patch(path string, handler Handler, middlewares ...Middleware) {
+	Route(http.MethodPatch, path, handler, middlewares...)
 }
 
 // Delete makes a route for DELETE method.
-func Delete(path string, handler Handler) {
-	Route(http.MethodDelete, path, handler)
+func Delete(path string, handler Handler, middlewares ...Middleware) {
+	Route(http.MethodDelete, path, handler, middlewares...)
 }
 
 // NotFound registers the "not found" handler.
@@ -99,12 +110,11 @@ func Address() string {
 }
 
 // Run starts the server.
-func Run() {
-	handler := http.Handler(rt)
+func Run(mm ...Middleware) {
+	handler := wrapHandler(rt, mm...)
 	if confI18n != nil {
 		confI18n.handleI18n(&handler)
 	}
-	// TODO: Handle external middlewares.
 	if !*production {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}
