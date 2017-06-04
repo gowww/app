@@ -144,7 +144,7 @@ func (c *Context) NotFound() {
 	}
 }
 
-// Error responds logs error and response with the error handler.
+// Error logs error and responds with the error handler.
 func (c *Context) Error(err error) {
 	log.Println(err)
 	if errorHandler != nil {
