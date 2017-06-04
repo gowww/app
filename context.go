@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/gowww/i18n"
+	"github.com/gowww/router"
 	"html/template"
 	"log"
 	"net/http"
-
-	"github.com/gowww/i18n"
-	"github.com/gowww/router"
 )
 
 // A Context contains the data for a handler.
@@ -126,6 +125,14 @@ func (c *Context) TnHTML(key string, n interface{}, a ...interface{}) template.H
 // Fmtn returns a formatted number with decimal and thousands marks.
 func (c *Context) Fmtn(n interface{}) string {
 	return i18n.Fmtn(i18n.RequestTranslator(c.Req).Locale, n)
+}
+
+// Push initiates an HTTP/2 server push with an Accept-Encoding header.
+// See net/http.Pusher for documentation.
+func (c *Context) Push(target string) {
+	if pusher, ok := c.Res.(http.Pusher); ok {
+		pusher.Push(target, nil)
+	}
 }
 
 // NotFound responds with the "not found" handler.
