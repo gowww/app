@@ -4,6 +4,7 @@ package app
 import (
 	"flag"
 	"github.com/gowww/compress"
+	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
 	gowwwlog "github.com/gowww/log"
 	"github.com/gowww/router"
@@ -123,6 +124,13 @@ func Run(mm ...Middleware) {
 			pp = append(pp, i18n.Parser(parser))
 		}
 		handler = i18n.Handle(handler, ll, confI18n.Fallback, pp...)
+	}
+	if errorHandler != nil {
+		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: errorHandler})
+	} else {
+		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		})})
 	}
 	handler = compress.Handle(handler)
 	if !*production {
