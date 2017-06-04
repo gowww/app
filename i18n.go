@@ -1,12 +1,10 @@
 package app
 
 import (
+	"github.com/gowww/i18n"
+	"golang.org/x/text/language"
 	"log"
 	"net/http"
-
-	"github.com/gowww/i18n"
-
-	"golang.org/x/text/language"
 )
 
 const (
@@ -24,6 +22,12 @@ var (
 	// ParseCookie parses the LocaleFieldName cookie.
 	ParseCookie = i18n.ParseCookie
 )
+
+type configurationI18n struct {
+	Locales  Locales
+	Fallback language.Tag
+	Parsers  []Parser
+}
 
 // Locales is a map of locales and their translations.
 type Locales map[language.Tag]Translations
@@ -47,25 +51,4 @@ func Localize(locs Locales, fallback language.Tag, parsers ...Parser) {
 		Locales:  locs,
 		Parsers:  parsers,
 	}
-}
-
-type configurationI18n struct {
-	Locales  Locales
-	Fallback language.Tag
-	Parsers  []Parser
-}
-
-func (conf *configurationI18n) handleI18n(handler *http.Handler) {
-	if confI18n == nil {
-		return
-	}
-	ll := make(i18n.Locales)
-	for lang, trans := range conf.Locales {
-		ll[lang] = i18n.Translations(trans)
-	}
-	var pp []i18n.Parser
-	for _, parser := range conf.Parsers {
-		pp = append(pp, i18n.Parser(parser))
-	}
-	*handler = i18n.Handle(*handler, ll, conf.Fallback, pp...)
 }

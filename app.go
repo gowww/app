@@ -3,13 +3,14 @@ package app
 
 import (
 	"flag"
+	"github.com/gowww/compress"
+	"github.com/gowww/i18n"
+	gowwwlog "github.com/gowww/log"
+	"github.com/gowww/router"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
-
-	gowwwlog "github.com/gowww/log"
-	"github.com/gowww/router"
 )
 
 var (
@@ -113,8 +114,17 @@ func Address() string {
 func Run(mm ...Middleware) {
 	handler := wrapHandler(rt, mm...)
 	if confI18n != nil {
-		confI18n.handleI18n(&handler)
+		ll := make(i18n.Locales)
+		for lang, trans := range confI18n.Locales {
+			ll[lang] = i18n.Translations(trans)
+		}
+		var pp []i18n.Parser
+		for _, parser := range confI18n.Parsers {
+			pp = append(pp, i18n.Parser(parser))
+		}
+		handler = i18n.Handle(handler, ll, confI18n.Fallback, pp...)
 	}
+	handler = compress.Handle(handler)
 	if !*production {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}
