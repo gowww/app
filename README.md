@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="https://cloud.githubusercontent.com/assets/9503891/26793312/d1a8013e-4a1d-11e7-9813-ef8ae75d296f.png" alt="gowww/app">
+	<img src="https://cloud.githubusercontent.com/assets/9503891/26803819/ebb4bf86-4a45-11e7-9f1e-a8c2e2b39717.png" alt="gowww/app">
 </p>
 
 Gowww App is a full featured HTTP framework for any web app.  
