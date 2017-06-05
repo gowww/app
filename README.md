@@ -340,5 +340,5 @@ In your views, use function `t` (or its variants: `tn`, `thtml`, `tnhtml`) to ge
 	<a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a>
 	<a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a>
 	<a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
-	<br><br><br>
+	<br><br>
 </p>
