@@ -90,6 +90,7 @@ func (c *Context) View(name string, data ...ViewData) {
 
 // JSON writes the response with a marshalled JSON.
 func (c *Context) JSON(v interface{}) {
+	c.Res.Header().Set("Content-Type", "application/json")
 	enc := json.NewEncoder(c.Res)
 	enc.Encode(v)
 }
