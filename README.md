@@ -1,4 +1,10 @@
-# [![gowww](https://avatars.githubusercontent.com/u/18078923?s=20)](https://github.com/gowww) app [![GoDoc](https://godoc.org/github.com/gowww/app?status.svg)](https://godoc.org/github.com/gowww/app) [![Build](https://travis-ci.org/gowww/app.svg?branch=master)](https://travis-ci.org/gowww/app) [![Coverage](https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master)](https://coveralls.io/github/gowww/app?branch=master) [![Go Report](https://goreportcard.com/badge/github.com/gowww/app)](https://goreportcard.com/report/github.com/gowww/app)
+<!--<p style="text-align:center">
+<a href="https://godoc.org/github.com/gowww/app"><img src="https://godoc.org/github.com/gowww/app?status.svg" alt="GoDoc"></a> <a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a> <a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a> <a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
+</p>-->
+
+<p style="text-align:center">
+	<img src="https://cloud.githubusercontent.com/assets/9503891/26793312/d1a8013e-4a1d-11e7-9813-ef8ae75d296f.png" alt="gowww/app">
+</p>
 
 Gowww App is a full featured HTTP framework for any web app.  
 It greatly increases productivity by providing helpers at all levels while maintaining best performance.
@@ -252,7 +258,7 @@ app.Get("/", func(c *app.Context) {
 
 ## Views
 
-Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory with in `.gohtml` files.  
+Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside `.gohtml` files within `views` directory.  
 They are automatically parsed on running.
 
 Use [`Context.View`](https://godoc.org/github.com/gowww/app#Context.View) to format and send a view template:
@@ -331,3 +337,10 @@ In your views, use function `t` (or its variants: `tn`, `thtml`, `tnhtml`) to ge
 ```HTML
 <h>{{t .c "hello"}}</h1>
 ```
+
+<p style="margin:40px auto;text-align:center">
+	<a href="https://godoc.org/github.com/gowww/app"><img src="https://godoc.org/github.com/gowww/app?status.svg" alt="GoDoc"></a>
+	<a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a>
+	<a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a>
+	<a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
+</p>
