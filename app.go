@@ -2,6 +2,7 @@
 package app
 
 import (
+	"context"
 	"flag"
 	"github.com/gowww/compress"
 	"github.com/gowww/fatal"
@@ -11,6 +12,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"path/filepath"
 )
 
@@ -126,6 +129,7 @@ func Run(mm ...Middleware) {
 		}
 		handler = i18n.Handle(handler, ll, confI18n.Fallback, pp...)
 	}
+
 	if errorHandler != nil {
 		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: errorHandler})
 	} else {
@@ -137,5 +141,20 @@ func Run(mm ...Middleware) {
 	if !*production {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}
-	log.Fatalln(http.ListenAndServe(*address, handler))
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	srv := &http.Server{Addr: *address, Handler: handler}
+	go func() {
+		<-quit
+		log.Print("Shutting down...")
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Fatalf("Could not shutdown: %v", err)
+		}
+	}()
+	log.Printf("Running on %v", *address)
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
+	log.Println("Gracefully shutted down")
 }
