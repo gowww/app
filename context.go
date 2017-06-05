@@ -17,6 +17,36 @@ type Context struct {
 	Req *http.Request
 }
 
+func contextHandle(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cw := &contextWriter{ResponseWriter: w}
+		defer func() {
+			if cw.status != 0 {
+				w.WriteHeader(cw.status)
+			}
+		}()
+		h.ServeHTTP(cw, r)
+	})
+}
+
+// logWriter catches the status code from WriteHeader.
+type contextWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (cw *contextWriter) WriteHeader(status int) {
+	cw.status = status
+}
+
+func (cw *contextWriter) Write(b []byte) (int, error) {
+	if cw.status != 0 {
+		cw.ResponseWriter.WriteHeader(cw.status)
+		cw.status = 0
+	}
+	return cw.ResponseWriter.Write(b)
+}
+
 // Get returns a context value.
 func (c *Context) Get(key interface{}) interface{} {
 	return c.Req.Context().Value(key)

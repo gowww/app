@@ -114,6 +114,7 @@ func Address() string {
 // Run starts the server.
 func Run(mm ...Middleware) {
 	handler := wrapHandler(rt, mm...)
+	handler = contextHandle(handler)
 	if confI18n != nil {
 		ll := make(i18n.Locales)
 		for lang, trans := range confI18n.Locales {
