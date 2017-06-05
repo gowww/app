@@ -1,7 +1,3 @@
-<!--<p style="text-align:center">
-<a href="https://godoc.org/github.com/gowww/app"><img src="https://godoc.org/github.com/gowww/app?status.svg" alt="GoDoc"></a> <a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a> <a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a> <a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
-</p>-->
-
 <p style="text-align:center">
 	<img src="https://cloud.githubusercontent.com/assets/9503891/26793312/d1a8013e-4a1d-11e7-9813-ef8ae75d296f.png" alt="gowww/app">
 </p>
