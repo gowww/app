@@ -98,7 +98,7 @@ func NotFound(handler Handler) {
 
 // Error registers the "internal error" handler.
 func Error(handler Handler) {
-	if rt.NotFoundHandler != nil {
+	if errorHandler != nil {
 		panic(`app: "internal error" handler set multiple times`)
 	}
 	errorHandler = handler
