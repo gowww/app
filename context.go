@@ -12,6 +12,7 @@ import (
 )
 
 // A Context contains the data for a handler.
+// TODO: Implement http.Pusher
 type Context struct {
 	Res http.ResponseWriter
 	Req *http.Request

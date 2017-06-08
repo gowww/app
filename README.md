@@ -267,7 +267,8 @@ app.Get("/", func(c *app.Context) {
 
 ## Static files
 
-Static files must be stored inside the `static` and are automatically accessible from the `/static/` path prefix.
+Static files must be stored inside the `static` directory.  
+They are automatically accessible from the `/static/` path prefix.
 
 ## Running
 
