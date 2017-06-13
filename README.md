@@ -224,7 +224,7 @@ app.Get("/old", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Push`](https://godoc.org/github.com/gowww/app#Context.Push) to initiates an HTTP/2 server push:
+Use [`Context.Push`](https://godoc.org/github.com/gowww/app#Context.Push) to initiate an HTTP/2 server push:
 
 ```Go
 app.Get("/", func(c *app.Context) {
