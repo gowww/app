@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"github.com/gowww/router"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 )
 
@@ -46,6 +48,45 @@ func (cw *contextWriter) Write(b []byte) (int, error) {
 		cw.status = 0
 	}
 	return cw.ResponseWriter.Write(b)
+}
+
+// CloseNotify implements the http.CloseNotifier interface.
+// No channel is returned if CloseNotify is not implemented by an upstream response writer.
+func (cw *contextWriter) CloseNotify() <-chan bool {
+	n, ok := cw.ResponseWriter.(http.CloseNotifier)
+	if !ok {
+		return nil
+	}
+	return n.CloseNotify()
+}
+
+// Flush implements the http.Flusher interface.
+// Nothing is done if Flush is not implemented by an upstream response writer.
+func (cw *contextWriter) Flush() {
+	f, ok := cw.ResponseWriter.(http.Flusher)
+	if ok {
+		f.Flush()
+	}
+}
+
+// Hijack implements the http.Hijacker interface.
+// Error http.ErrNotSupported is returned if Hijack is not implemented by an upstream response writer.
+func (cw *contextWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := cw.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, http.ErrNotSupported
+	}
+	return h.Hijack()
+}
+
+// Push implements the http.Pusher interface.
+// http.ErrNotSupported is returned if Push is not implemented by an upstream response writer or not supported by the client.
+func (cw *contextWriter) Push(target string, opts *http.PushOptions) error {
+	p, ok := cw.ResponseWriter.(http.Pusher)
+	if !ok {
+		return http.ErrNotSupported
+	}
+	return p.Push(target, opts)
 }
 
 // Get returns a context value.
