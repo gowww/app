@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	address      = flag.String("a", ":8080", "the address to listen and serving on")
+	address      = flag.String("a", ":8080", "the address to listen and serve on")
 	production   = flag.Bool("p", false, "run the server in production environment")
 	rt           = router.New()
 	errorHandler Handler
@@ -149,12 +149,12 @@ func Run(mm ...Middleware) {
 		<-quit
 		log.Print("Shutting down...")
 		if err := srv.Shutdown(context.Background()); err != nil {
-			log.Fatalf("Could not shutdown: %v", err)
+			log.Fatalf("Could not shut down: %v", err)
 		}
 	}()
 	log.Printf("Running on %v", *address)
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
-	log.Println("Gracefully shutted down")
+	log.Println("Gracefully shut down")
 }
