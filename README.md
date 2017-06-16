@@ -27,7 +27,7 @@ It greatly increases productivity by providing helpers at all levels while maint
 2. Install gowww/app:
 
    ```Shell
-   go get https://github.com/gowww/app
+   go get github.com/gowww/app
    ```
 
 3. Import it in your new app:
