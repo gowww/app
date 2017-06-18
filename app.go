@@ -4,17 +4,18 @@ package app
 import (
 	"context"
 	"flag"
-	"github.com/gowww/compress"
-	"github.com/gowww/fatal"
-	"github.com/gowww/i18n"
-	gowwwlog "github.com/gowww/log"
-	"github.com/gowww/router"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
+
+	"github.com/gowww/compress"
+	"github.com/gowww/fatal"
+	"github.com/gowww/i18n"
+	gowwwlog "github.com/gowww/log"
+	"github.com/gowww/router"
 )
 
 var (
@@ -147,7 +148,7 @@ func Run(mm ...Middleware) {
 	srv := &http.Server{Addr: *address, Handler: handler}
 	go func() {
 		<-quit
-		log.Print("Shutting down...")
+		log.Println("Shutting down...")
 		if err := srv.Shutdown(context.Background()); err != nil {
 			log.Fatalf("Could not shut down: %v", err)
 		}

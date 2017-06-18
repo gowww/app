@@ -1,8 +1,6 @@
 package app
 
-import (
-	"net/http"
-)
+import "net/http"
 
 // RouterGroup contains the first path part for a routes group.
 type RouterGroup struct {
