@@ -5,12 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gowww/i18n"
-	"github.com/gowww/router"
 	"html/template"
 	"log"
 	"net"
 	"net/http"
+
+	"github.com/gowww/i18n"
+	"github.com/gowww/router"
 )
 
 // A Context contains the data for a handler.

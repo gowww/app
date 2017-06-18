@@ -1,10 +1,11 @@
 package app
 
 import (
-	"github.com/gowww/i18n"
-	"golang.org/x/text/language"
 	"log"
 	"net/http"
+
+	"github.com/gowww/i18n"
+	"golang.org/x/text/language"
 )
 
 const (

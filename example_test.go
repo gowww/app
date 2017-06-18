@@ -1,10 +1,11 @@
 package app_test
 
 import (
-	"github.com/gowww/app"
-	"golang.org/x/text/language"
 	"log"
 	"net/http"
+
+	"github.com/gowww/app"
+	"golang.org/x/text/language"
 )
 
 func Example() {
