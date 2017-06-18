@@ -203,9 +203,9 @@ func (c *Context) Fmtn(n interface{}) string {
 
 // Push initiates an HTTP/2 server push with an Accept-Encoding header.
 // See net/http.Pusher for documentation.
-func (c *Context) Push(target string) {
+func (c *Context) Push(target string, opts *http.PushOptions) {
 	if pusher, ok := c.Res.(http.Pusher); ok {
-		pusher.Push(target, nil)
+		pusher.Push(target, opts)
 	}
 }
 
