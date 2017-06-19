@@ -15,13 +15,6 @@ import (
 	"github.com/gowww/router"
 )
 
-type contextKey int
-
-// Context keys
-const (
-	contextKeyError contextKey = iota
-)
-
 // A Context contains the data for a handler.
 type Context struct {
 	Res http.ResponseWriter
@@ -253,13 +246,6 @@ func (c *Context) Panic(err error) {
 }
 
 // Error returns the error value stored in request's context after a recovering or a Context.Error call.
-func (c *Context) Error() error {
-	err := fatal.Error(c.Req)
-	if err == nil {
-		err = c.Get(contextKeyError)
-	}
-	if err == nil {
-		return nil
-	}
-	return fmt.Errorf("%v", err)
+func (c *Context) Error() string {
+	return fmt.Sprintf("%v", fatal.Error(c.Req))
 }

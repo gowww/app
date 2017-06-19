@@ -208,11 +208,11 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Error`](https://godoc.org/github.com/gowww/app#Context.Error) to log an error and send a "500 Internal Server Error" response:
+Use [`Context.Panic`](https://godoc.org/github.com/gowww/app#Context.Panic) to log an error and send a "500 Internal Server Error" response:
 
 ```Go
 app.Get("/", func(c *app.Context) {
-	c.Error("database connection failed")
+	c.Panic("database connection failed")
 })
 ```
 

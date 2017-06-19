@@ -98,6 +98,8 @@ func NotFound(handler Handler) {
 }
 
 // Error registers the "internal error" handler.
+//
+// Using Context.Error, you can retreive the error value stored in request's context during recovering.
 func Error(handler Handler) {
 	if errorHandler != nil {
 		panic(`app: "internal error" handler set multiple times`)
