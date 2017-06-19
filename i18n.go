@@ -1,7 +1,6 @@
 package app
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gowww/i18n"
@@ -42,7 +41,7 @@ type Parser func(*http.Request) []language.Tag
 // Localize sets app locales with fallback and client locale parsers (order is mandatory and default are ParseFormValue, ParseAcceptLanguage).
 func Localize(locs Locales, fallback language.Tag, parsers ...Parser) {
 	if confI18n != nil {
-		log.Fatal("app: locales can be set only once")
+		panic("app: locales set multiple times")
 	}
 	if len(parsers) == 0 {
 		parsers = []Parser{ParseFormValue, ParseAcceptLanguage}
