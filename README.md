@@ -88,7 +88,7 @@ app.Get("/users/:id", func(c *app.Context) {
 })
 ```
 
-Use a trailing `/` to match the beginning of a path and retreive the end of the path under `*`:
+Use a trailing `/` to match the beginning of a path and retrieve the end of the path under `*`:
 
 ```Go
 app.Get("/users/:id/files/", func(c *app.Context) {
@@ -244,7 +244,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Get`](https://godoc.org/github.com/gowww/app#Context.Get) to retreive a value:
+Use [`Context.Get`](https://godoc.org/github.com/gowww/app#Context.Get) to retrieve a value:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -278,7 +278,7 @@ Call [`Run`](https://godoc.org/github.com/gowww/app#Run) at the end of your main
 app.Run()
 ```
 
-By default, your app will listend and serve on `:8080`.  
+By default, your app will listen and serve on `:8080`.  
 But you can change this address by using flag `-a` when running your app:
 
 ```Shell

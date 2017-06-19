@@ -147,7 +147,7 @@ func (c *Context) Status(code int) {
 //	.c	the Context
 func (c *Context) View(name string, data ...ViewData) {
 	d := make(ViewData)
-	for k, v := range GlobalViewData {
+	for k, v := range globalViewData {
 		d[k] = v
 	}
 	for _, dt := range data {
