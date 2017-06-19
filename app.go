@@ -119,6 +119,17 @@ func Address() string {
 func Run(mm ...Middleware) {
 	handler := wrapHandler(rt, mm...)
 	handler = contextHandle(handler)
+
+	// gowww/fatal
+	if errorHandler != nil {
+		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: errorHandler})
+	} else {
+		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		})})
+	}
+
+	// gowww/i18n
 	if confI18n != nil {
 		ll := make(i18n.Locales)
 		for lang, trans := range confI18n.Locales {
@@ -131,14 +142,10 @@ func Run(mm ...Middleware) {
 		handler = i18n.Handle(handler, ll, confI18n.Fallback, pp...)
 	}
 
-	if errorHandler != nil {
-		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: errorHandler})
-	} else {
-		handler = fatal.Handle(handler, &fatal.Options{RecoverHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		})})
-	}
+	// gowww/compress
 	handler = compress.Handle(handler)
+
+	// gowww/log
 	if !*production {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}

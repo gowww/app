@@ -23,7 +23,6 @@ const (
 )
 
 // A Context contains the data for a handler.
-// TODO: Implement http.Pusher
 type Context struct {
 	Res http.ResponseWriter
 	Req *http.Request
@@ -41,7 +40,8 @@ func contextHandle(h http.Handler) http.Handler {
 	})
 }
 
-// logWriter catches the status code from WriteHeader.
+// logWriter keeps the status code from WriteHeader to allow setting headers after a Context.Status call.
+// Required when using Context.Status with Context.JSON, for example.
 type contextWriter struct {
 	http.ResponseWriter
 	status int
@@ -183,7 +183,11 @@ func (c *Context) Redirect(url string, status int) {
 
 // T returns the translation associated to key, for the client locale.
 func (c *Context) T(key string, a ...interface{}) string {
-	return i18n.RequestTranslator(c.Req).T(key, a...)
+	rt := i18n.RequestTranslator(c.Req)
+	if rt == nil {
+		return fmt.Sprintf("[%v]", key)
+	}
+	return rt.T(key, a...)
 }
 
 // Tn returns the translation associated to key, for the client locale.
@@ -191,22 +195,38 @@ func (c *Context) T(key string, a ...interface{}) string {
 // All i18n.TnPlaceholder in the translation are replaced with number n.
 // When translation is not found, an empty string is returned.
 func (c *Context) Tn(key string, n interface{}, a ...interface{}) string {
-	return i18n.RequestTranslator(c.Req).Tn(key, n, a...)
+	rt := i18n.RequestTranslator(c.Req)
+	if rt == nil {
+		return fmt.Sprintf("[%v]", key)
+	}
+	return rt.Tn(key, n, a...)
 }
 
 // THTML works like T but returns an HTML unescaped translation. An "nl2br" function is applied to the result.
 func (c *Context) THTML(key string, a ...interface{}) template.HTML {
-	return i18n.RequestTranslator(c.Req).THTML(key, a...)
+	rt := i18n.RequestTranslator(c.Req)
+	if rt == nil {
+		return template.HTML(fmt.Sprintf("[%v]", key))
+	}
+	return rt.THTML(key, a...)
 }
 
 // TnHTML works like Tn but returns an HTML unescaped translation. An "nl2br" function is applied to the result.
 func (c *Context) TnHTML(key string, n interface{}, a ...interface{}) template.HTML {
-	return i18n.RequestTranslator(c.Req).TnHTML(key, n, a...)
+	rt := i18n.RequestTranslator(c.Req)
+	if rt == nil {
+		return template.HTML(fmt.Sprintf("[%v]", key))
+	}
+	return rt.TnHTML(key, n, a...)
 }
 
 // Fmtn returns a formatted number with decimal and thousands marks.
 func (c *Context) Fmtn(n interface{}) string {
-	return i18n.Fmtn(i18n.RequestTranslator(c.Req).Locale, n)
+	rt := i18n.RequestTranslator(c.Req)
+	if rt == nil {
+		return fmt.Sprintf("[%v]", n)
+	}
+	return i18n.Fmtn(rt.Locale, n)
 }
 
 // Push initiates an HTTP/2 server push with an Accept-Encoding header.
@@ -226,19 +246,14 @@ func (c *Context) NotFound() {
 	}
 }
 
-// Error logs error and responds with the error handler if set.
-func (c *Context) Error(err error) {
-	log.Println("Failed serving "+c.Req.RemoteAddr+":", err)
-	c.Set(contextKeyError, err)
-	if errorHandler != nil {
-		errorHandler.ServeHTTP(c.Res, c.Req)
-	} else {
-		http.Error(c.Res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	}
+// Panic logs error with stack trace and responds with the error handler if set.
+func (c *Context) Panic(err error) {
+	panic(fmt.Errorf("Failed serving %s: %v", c.Req.RemoteAddr, err))
+
 }
 
-// GetError returns the error value stored in request's context after a recovering or a Context.Error call.
-func (c *Context) GetError() error {
+// Error returns the error value stored in request's context after a recovering or a Context.Error call.
+func (c *Context) Error() error {
 	err := fatal.Error(c.Req)
 	if err == nil {
 		err = c.Get(contextKeyError)
