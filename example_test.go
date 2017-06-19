@@ -45,7 +45,7 @@ func Example() {
 	}
 
 	if !app.EnvProduction() {
-		log.Printf("developing app on %s\n", app.Address())
+		log.Printf("Developing app on %s\n", app.Address())
 	}
 
 	app.Run()
