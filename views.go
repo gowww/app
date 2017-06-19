@@ -8,14 +8,35 @@ import (
 )
 
 var (
-	// GlobalViewData is a map of data passed to all view rederings.
-	GlobalViewData ViewData
-
-	views *template.Template
+	views           *template.Template
+	globalViewData  ViewData
+	globalViewFuncs ViewFuncs
 )
 
+// ViewData represents data for a view rendering.
+type ViewData map[string]interface{}
+
+// ViewFuncs is a map of functions passed to all view renderings.
+type ViewFuncs map[string]interface{}
+
+// GlobalViewFuncs sets a map of functions passed to all view renderings.
+func GlobalViewFuncs(funcs ViewFuncs) {
+	if globalViewFuncs != nil {
+		panic(`app: view functions set multiple times`)
+	}
+	globalViewFuncs = funcs
+}
+
+// GlobalViewData sets a map of data passed to all view renderings.
+func GlobalViewData(data ViewData) {
+	if globalViewData != nil {
+		panic(`app: view data set multiple times`)
+	}
+	globalViewData = data
+}
+
 func parseViews() {
-	views = template.Must(template.New("main").Funcs(template.FuncMap{
+	ff := template.FuncMap{
 		"t": func(c *Context, key string, a ...interface{}) string {
 			return c.T(key, a...)
 		},
@@ -53,11 +74,17 @@ func parseViews() {
 		"envproduction": func(name string) bool {
 			return EnvProduction()
 		},
-	}).ParseGlob("views/*.gohtml"))
-}
+	}
 
-// ViewData represents data for a view rendering.
-type ViewData map[string]interface{}
+	for n, f := range globalViewFuncs {
+		if _, ok := ff[n]; ok {
+			panic(`app: view function "` + n + `" already exists`)
+		}
+		ff[n] = f
+	}
+
+	views = template.Must(template.New("main").Funcs(ff).ParseGlob("views/*.gohtml"))
+}
 
 func viewFuncStyles(styles ...string) (h template.HTML) {
 	for _, style := range styles {

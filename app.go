@@ -28,17 +28,8 @@ var (
 func init() {
 	flag.Parse()
 
-	// Serve static content
+	// Serve static content.
 	rt.Get("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
-	// Parse views
-	files, _ := ioutil.ReadDir("views")
-	for _, f := range files {
-		if !f.IsDir() && filepath.Ext(f.Name()) == ".gohtml" {
-			parseViews()
-			return
-		}
-	}
 }
 
 // A Handler handles a request.
@@ -99,7 +90,7 @@ func NotFound(handler Handler) {
 
 // Error registers the "internal error" handler.
 //
-// Using Context.Error, you can retreive the error value stored in request's context during recovering.
+// Using Context.Error, you can retrieve the error value stored in request's context during recovering.
 func Error(handler Handler) {
 	if errorHandler != nil {
 		panic(`app: "internal error" handler set multiple times`)
@@ -119,6 +110,15 @@ func Address() string {
 
 // Run starts the server.
 func Run(mm ...Middleware) {
+	// Parse views.
+	files, _ := ioutil.ReadDir("views")
+	for _, f := range files {
+		if !f.IsDir() && filepath.Ext(f.Name()) == ".gohtml" {
+			parseViews()
+			break
+		}
+	}
+
 	handler := wrapHandler(rt, mm...)
 	handler = contextHandle(handler)
 
@@ -152,6 +152,7 @@ func Run(mm ...Middleware) {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}
 
+	// Wait for shut down.
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	srv := &http.Server{Addr: *address, Handler: handler}
@@ -162,6 +163,7 @@ func Run(mm ...Middleware) {
 			log.Fatalf("Could not shut down: %v", err)
 		}
 	}()
+
 	log.Printf("Running on %v", *address)
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatal(err)
