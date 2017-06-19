@@ -10,8 +10,16 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
 	"github.com/gowww/router"
+)
+
+type contextKey int
+
+// Context keys
+const (
+	contextKeyError contextKey = iota
 )
 
 // A Context contains the data for a handler.
@@ -218,12 +226,25 @@ func (c *Context) NotFound() {
 	}
 }
 
-// Error logs error and responds with the error handler.
+// Error logs error and responds with the error handler if set.
 func (c *Context) Error(err error) {
-	log.Println(err)
+	log.Println("Failed serving "+c.Req.RemoteAddr+":", err)
+	c.Set(contextKeyError, err)
 	if errorHandler != nil {
 		errorHandler.ServeHTTP(c.Res, c.Req)
 	} else {
 		http.Error(c.Res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+}
+
+// GetError returns the error value stored in request's context after a recovering or a Context.Error call.
+func (c *Context) GetError() error {
+	err := fatal.Error(c.Req)
+	if err == nil {
+		err = c.Get(contextKeyError)
+	}
+	if err == nil {
+		return nil
+	}
+	return fmt.Errorf("%v", err)
 }
