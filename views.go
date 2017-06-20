@@ -3,8 +3,15 @@ package app
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"time"
+)
+
+const (
+	viewsDir = "views"
+	viewsExt = ".gohtml"
 )
 
 var (
@@ -36,6 +43,15 @@ func GlobalViewData(data ViewData) {
 }
 
 func parseViews() {
+	files, _ := ioutil.ReadDir(viewsDir)
+	for _, f := range files {
+		if !f.IsDir() && filepath.Ext(f.Name()) == viewsExt {
+			goto Parse
+		}
+	}
+	return
+
+Parse:
 	ff := template.FuncMap{
 		"t": func(c *Context, key string, a ...interface{}) string {
 			return c.T(key, a...)
@@ -83,7 +99,7 @@ func parseViews() {
 		ff[n] = f
 	}
 
-	views = template.Must(template.New("main").Funcs(ff).ParseGlob("views/*.gohtml"))
+	views = template.Must(template.New("main").Funcs(ff).ParseGlob(viewsDir + "/*" + viewsExt))
 }
 
 func viewFuncStyles(styles ...string) (h template.HTML) {

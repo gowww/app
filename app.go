@@ -4,12 +4,10 @@ package app
 import (
 	"context"
 	"flag"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 
 	"github.com/gowww/compress"
 	"github.com/gowww/fatal"
@@ -19,10 +17,11 @@ import (
 )
 
 var (
-	address      = flag.String("a", ":8080", "the address to listen and serve on")
-	production   = flag.Bool("p", false, "run the server in production environment")
-	rt           = router.New()
 	errorHandler Handler
+
+	address    = flag.String("a", ":8080", "the address to listen and serve on")
+	production = flag.Bool("p", false, "run the server in production environment")
+	rt         = router.New()
 )
 
 func init() {
@@ -110,14 +109,7 @@ func Address() string {
 
 // Run starts the server.
 func Run(mm ...Middleware) {
-	// Parse views.
-	files, _ := ioutil.ReadDir("views")
-	for _, f := range files {
-		if !f.IsDir() && filepath.Ext(f.Name()) == ".gohtml" {
-			parseViews()
-			break
-		}
-	}
+	parseViews()
 
 	handler := wrapHandler(rt, mm...)
 	handler = contextHandle(handler)
