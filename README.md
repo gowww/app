@@ -380,7 +380,7 @@ These function are available out of the box:
 | `nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                    | `{{nl2br "line one\nline two"}}`                   |
 | `styles`        | Sets an HTML link to the given stylesheets.                                                                                      | `{{styles "/static/main.css" "/static/user.css"}}` |
 | `scripts`       | Sets an HTML link to the given scripts.                                                                                          | `{{scripts "/static/main.js" "/static/user.js"}}`  |
-| `googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given fonts.                                   | `{{googlefonts "Open+Sans:400,700|Spectral"}}`     |
+| `googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given fonts.                                   | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`    |
 | `envproduction` | Tells if the app is run with the production flag (returns a `bool`).                                                             | `{{if envproduction}}Live{{else}}Testing{{end}}`   |
 
 ## Static files
