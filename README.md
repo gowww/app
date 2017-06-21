@@ -38,15 +38,7 @@ It greatly increases productivity by providing helpers at all levels while maint
 
 ## Routing
 
-You can add a route using [`Route`](https://godoc.org/github.com/gowww/app#Route) and providing a method, a path and a handler:
-
-```Go
-app.Route("GET", "/", func(c *app.Context) {
-	// Write response for GET /
-})
-```
-
-There are also shortcuts for common HTTP methods:
+There are methods for common HTTP methods:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -72,34 +64,51 @@ app.Delete("/", func(c *app.Context) {
 
 ### Path parameters
 
-Use `:` to set a named parameter in the path and matching any value in this path part (between two `/`):
+#### Named
 
-```Go
-app.Get("/user/:id", func(c *app.Context) {
-	// Write response for GET /user/1 or GET /user/2, etc.
-})
-```
+A named parameter begins with `:` and matches any value until the next `/` in path.
 
-To access a parameter value, call [`Context.PathValue`](https://godoc.org/github.com/gowww/app#Context.PathValue):
+To retrieve the value, ask [`Context.PathValue`](https://godoc.org/github.com/gowww/app#Context.PathValue).  
+It will return the value as a string (empty if the parameter doesn't exist).
+
+Example, with a parameter `id`:
 
 ```Go
 app.Get("/users/:id", func(c *app.Context) {
-	userID := c.PathValue("id")
-})
+	id := c.PathValue("id")
+	fmt.Fprintf(w, "Page of user #%s", id)
+}))
 ```
 
-Use a trailing `/` to match the beginning of a path and retrieve the end of the path under `*`:
+#### Regular expressions
+
+If a parameter must match an exact pattern (digits only, for example), you can also set a [regular expression](https://golang.org/pkg/regexp/syntax) constraint just after the parameter name and another `:`:
 
 ```Go
-app.Get("/users/:id/files/", func(c *app.Context) {
-	userID := c.PathValue("id")
-	userFile := c.PathValue("*")
-})
+app.Get(`/users/:id:^\d+$`, func(c *app.Context) {
+	id := c.PathValue("id")
+	fmt.Fprintf(w, "Page of user #%s", id)
+}))
 ```
+
+If you don't need to retrieve the parameter value but only use a regular expression, you can omit the parameter name.
+
+#### Wildcard
+
+A trailing slash behaves like a wildcard by matching the beginning of the request path and keeping the rest as a parameter value, under `*`:
+
+```Go
+rt.Get("/files/", func(c *app.Context) {
+	filepath := c.PathValue("*")
+	fmt.Fprintf(w, "Get file %s", filepath)
+}))
+```
+
+For more details, see [gowww/router](https://github.com/gowww/router).
 
 ### Groups
 
-A routing group works like the top-level router but prefixes all subroutes paths:
+A routing group works like the top-level router but prefixes all subroute paths:
 
 ```Go
 api := app.Group("/api")
@@ -120,19 +129,25 @@ api := app.Group("/api")
 
 ### Errors
 
-You can set a custom handler for "404 Not Found" error with [`NotFound`](https://godoc.org/github.com/gowww/app#NotFound):
+You can set a custom "not found" handler with [`NotFound`](https://godoc.org/github.com/gowww/app#NotFound):
 
 ```Go
 app.NotFound(func(c *app.Context) {
-	// Write response for "404 Not Found"
+	c.Status(http.StatusNotFound)
+	c.View("notFound")
 })
 ```
 
-The app is also recovered from panics so you can set a custom handler (which is used only when the response is not already written) for "500 Internal Server Error" with [`Error`](https://godoc.org/github.com/gowww/app#NotFound):
+The app is also recovered from panics so you can set a custom "serving error" handler (which is used only when the response is not already written) with [`Error`](https://godoc.org/github.com/gowww/app#NotFound) and retrive the recovered error value with [`Context.Error`](https://godoc.org/github.com/gowww/app#Context.Error):
 
 ```Go
 app.Error(func(c *app.Context) {
-	// Write response for "500 Internal Server Error"
+	c.Status(http.StatusInternalServerError)
+	if c.Error() == "cannot open file" {
+		c.View("errorStorage")
+		return
+	}
+	c.View("error")
 })
 ```
 
@@ -184,9 +199,9 @@ app.Get("/", func(c *app.Context) {
 Use [`Context.JSON`](https://godoc.org/github.com/gowww/app#Context.JSON) to send a JSON formatted response:
 
 ```Go
-app.Get("/", func(c *app.Context) {
+app.Get("/users/:id:^\d+$/files/", func(c *app.Context) {
 	c.JSON(map[string]interface{}{
-		"id":       c.PathValue("id"),
+		"userID":   c.PathValue("id"),
 		"filepath": c.PathValue("*"),
 	})
 })
@@ -200,7 +215,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.NotFound`](https://godoc.org/github.com/gowww/app#Context.NotFound) to send a "404 Not Found" response:
+Use [`Context.NotFound`](https://godoc.org/github.com/gowww/app#Context.NotFound) to send a "not found" response:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -208,7 +223,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Panic`](https://godoc.org/github.com/gowww/app#Context.Panic) to log an error and send a "500 Internal Server Error" response:
+Use [`Context.Panic`](https://godoc.org/github.com/gowww/app#Context.Panic) to log an error and send a "serving error" response:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -228,7 +243,7 @@ Use [`Context.Push`](https://godoc.org/github.com/gowww/app#Context.Push) to ini
 
 ```Go
 app.Get("/", func(c *app.Context) {
-	c.Push("/static/main.css")
+	c.Push("/static/main.css", nil)
 })
 ```
 
@@ -254,10 +269,10 @@ app.Get("/", func(c *app.Context) {
 
 ## Views
 
-Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside `.gohtml` files within `views` directory.  
-They are automatically parsed on running.
+Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory, within `.gohtml` files.  
+They are automatically parsed during launch.
 
-Use [`Context.View`](https://godoc.org/github.com/gowww/app#Context.View) to format and send a view template:
+Use [`Context.View`](https://godoc.org/github.com/gowww/app#Context.View) to send a view:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -306,7 +321,7 @@ They can be set for:
 
   ```Go
   api := app.Get("/", func(c *app.Context) {
-	  // Write response for GET /
+  	// Write response for GET /
   }, hand1, hand2, hand3)
   ```
 
@@ -334,6 +349,8 @@ In your views, use function `t` (or its variants: `tn`, `thtml`, `tnhtml`) to ge
 ```HTML
 <h>{{t .c "hello"}}</h1>
 ```
+
+For more details, see [gowww/i18n](https://github.com/gowww/i18n).
 
 <p align="center">
 	<br><br>
