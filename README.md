@@ -17,11 +17,14 @@ It greatly increases productivity by providing helpers at all levels while maint
   - [Request](#request)
   - [Response](#response)
   - [Values](#values)
+- [Internationalization](#internationalization)
 - [Views](#views)
+  - [Data](#data)
+  - [Functions](#functions)
+  - [Built-in](#built-in)
 - [Static files](#static-files)
 - [Running](#running)
 - [Middlewares](#middlewares)
-- [Internationalization](#internationalization)
 
 ## Start
 
@@ -270,6 +273,31 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
+## Internationalization
+
+To have translations accessible all over your app, use [`Localize`](https://godoc.org/github.com/gowww/app#Localize) with your locales, their translations (a map of string to string) and the default locale:
+
+```Go
+var locales = app.Locales{
+	language.English: {
+		"hello": "Hello!",
+	},
+	language.French: {
+		"hello": "Bonjour !",
+	},
+}
+
+app.Localize(locales, language.English)
+```
+
+In your views, use function `t` (or its variants: `tn`, `thtml`, `tnhtml`) to get a translation:
+
+```HTML
+<h1>{{t .c "hello"}}</h1>
+```
+
+For more details, see [gowww/i18n](https://github.com/gowww/i18n).
+
 ## Views
 
 Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory, within `.gohtml` files.  
@@ -282,6 +310,78 @@ app.Get("/", func(c *app.Context) {
 	c.View("home")
 })
 ```
+
+### Data
+
+Use a [`ViewData`](https://godoc.org/github.com/gowww/app#ViewData) map to pass data to a view.  
+Note that the context is automatically stored in the view data under key `c`.
+
+You can also use [`GlobalViewData`](https://godoc.org/github.com/gowww/app#GlobalViewData) to set data for all views:
+
+
+```Go
+app.GlobalViewData(app.ViewData{
+	"appName": "My app",
+})
+
+app.Get("/", func(c *app.Context) {
+	user := &User{
+		ID:   1,
+		Name: "John Doe",
+	}
+	c.View("home", app.ViewData{
+		"user": user,
+	})
+})
+```
+
+In *views/home.gohtml*:
+
+```HTML
+{{define "home"}}
+	<h1>Hello {{.user.Name}} ({{.c.Req.RemoteAddr}}) and welcome on {{.appName}}!</h1>
+{{end}}
+```
+
+### Functions
+
+Use [`GlobalViewFuncs`](https://godoc.org/github.com/gowww/app#GlobalViewFuncs) to set functions for all views:
+
+```Go
+app.GlobalViewFuncs(app.ViewFuncs{
+	"pathescape": url.PathEscape,
+})
+
+app.Get("/posts/new", func(c *app.Context) {
+	c.View("postsNew")
+})
+```
+
+In *views/posts.gohtml*:
+
+```HTML
+{{define "postsNew"}}
+	<a href="/sign-in?return-to={{pathescape "/posts/new"}}">Sign in</a>
+{{end}}
+```
+
+#### Built-in
+
+These function are available out of the box:
+
+| Function        | Description                                                                                                                      | Usage                                              |
+------------------|----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
+| `t`             | Returns the translation associated to key, for the client locale.                                                                | `{{t .c "hello"}}`                                 |
+| `thtml`         | Works like `t` but returns an HTML unescaped translation. `nl2br` is applied to the result.                                      | `{{t .c "hello"}}`                                 |
+| `tn`            | Works like `t` with plural variations (zero, one, other). See [`Context.Tn`](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                              |
+| `tnhtml`        | Works like `tn` + `thml`. See [`Context.TnHTML`](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                          |
+| `fmtn`          | Returns a formatted number with decimal and thousands marks.                                                                     | `{{fmtn 123456.123456}}`                           |
+| `safehtml`      | Returns a string that will not be unescaped. Be carefull.                                                                        | `{{safehtml "<strong>word</strong>"}}`             |
+| `nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                    | `{{nl2br "line one\nline two"}}`                   |
+| `styles`        | Sets an HTML link to the given stylesheets.                                                                                      | `{{styles "/static/main.css" "/static/user.css"}}` |
+| `scripts`       | Sets an HTML link to the given scripts.                                                                                          | `{{scripts "/static/main.js" "/static/user.js"}}`  |
+| `googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given fonts.                                   | `{{googlefonts "Open+Sans:400,700|Spectral"}}`     |
+| `envproduction` | Tells if the app is run with the production flag (returns a `bool`).                                                             | `{{if envproduction}}Live{{else}}Testing{{end}}`   |
 
 ## Static files
 
@@ -329,31 +429,6 @@ They can be set for:
   ```
 
 First handler wraps the second and so on.
-
-## Internationalization
-
-To have translations accessible all over your app, use [`Localize`](https://godoc.org/github.com/gowww/app#Localize) with your locales, their translations (a map of string to string) and the default locale:
-
-```Go
-var locales = app.Locales{
-	language.English: {
-		"hello": "Hello!",
-	},
-	language.French: {
-		"hello": "Bonjour !",
-	},
-}
-
-app.Localize(locales, language.English)
-```
-
-In your views, use function `t` (or its variants: `tn`, `thtml`, `tnhtml`) to get a translation:
-
-```HTML
-<h>{{t .c "hello"}}</h1>
-```
-
-For more details, see [gowww/i18n](https://github.com/gowww/i18n).
 
 <p align="center">
 	<br><br>

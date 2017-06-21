@@ -1,12 +1,10 @@
 package app
 
 import (
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 const (
@@ -71,8 +69,8 @@ Parse:
 		"safehtml": func(s string) template.HTML {
 			return template.HTML(s)
 		},
-		"nl2br": func(s string) template.HTML {
-			return template.HTML(strings.Replace(s, "\n", "<br>", -1))
+		"nl2br": func(s string) string {
+			return strings.Replace(s, "\n", "<br>", -1)
 		},
 		"styles": viewFuncStyles,
 		"scripts": func(scripts ...string) (h template.HTML) {
@@ -84,10 +82,7 @@ Parse:
 		"googlefonts": func(fonts ...string) template.HTML {
 			return viewFuncStyles("https://fonts.googleapis.com/css?family=" + strings.Join(fonts, "|"))
 		},
-		"copyright": func(name string) string {
-			return fmt.Sprintf("© %s %d", name, time.Now().Year())
-		},
-		"envproduction": func(name string) bool {
+		"envproduction": func() bool {
 			return EnvProduction()
 		},
 	}
