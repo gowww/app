@@ -8,6 +8,9 @@ It greatly increases productivity by providing helpers at all levels while maint
 - [Start](#start)
 - [Routing](#routing)
   - [Path parameters](#path-parameters)
+    - [Named](#named)
+    - [Regular expressions](#regular-expressions)
+    - [Wildcard](#wildcard)
   - [Groups](#groups)
   - [Errors](#errors)
 - [Context](#context)
@@ -199,7 +202,7 @@ app.Get("/", func(c *app.Context) {
 Use [`Context.JSON`](https://godoc.org/github.com/gowww/app#Context.JSON) to send a JSON formatted response:
 
 ```Go
-app.Get("/users/:id:^\d+$/files/", func(c *app.Context) {
+app.Get(`/users/:id:^\d+$/files/`, func(c *app.Context) {
 	c.JSON(map[string]interface{}{
 		"userID":   c.PathValue("id"),
 		"filepath": c.PathValue("*"),
