@@ -21,6 +21,7 @@ type Context struct {
 	Req *http.Request
 }
 
+// contextHandle wraps the router for setting headers and deferring their write.
 func contextHandle(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cw := &contextWriter{ResponseWriter: w}
@@ -29,6 +30,7 @@ func contextHandle(h http.Handler) http.Handler {
 				w.WriteHeader(cw.status)
 			}
 		}()
+		cw.Header().Set("Connection", "keep-alive")
 		h.ServeHTTP(cw, r)
 	})
 }
