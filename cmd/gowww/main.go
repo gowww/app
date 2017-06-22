@@ -1,4 +1,4 @@
-// Gowww helps developing with gowww/app.
+// gowww is the CLI of the gowww/app framework.
 package main
 
 import (
