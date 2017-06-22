@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"time"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -64,7 +63,6 @@ func cmdRun() {
 				panic(err)
 			}
 		}
-		time.Sleep(500 * time.Millisecond)
 	}
 }
 
