@@ -2,7 +2,7 @@
 	<img src="https://cloud.githubusercontent.com/assets/9503891/26803819/ebb4bf86-4a45-11e7-9f1e-a8c2e2b39717.png" alt="gowww/app">
 </p>
 
-Gowww App is a full featured HTTP framework for any web app.  
+**gowww/app** is a full featured HTTP framework for any web app.  
 It greatly increases productivity by providing helpers at all levels while maintaining best performance.
 
 - [Start](#start)
