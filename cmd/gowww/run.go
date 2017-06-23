@@ -10,38 +10,46 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func cmdRun() {
+var (
+	watchBuildName string
+	runningProc    *os.Process
+	watcher        *fsnotify.Watcher
+)
+
+func setWatchBuildName() {
+	var err error
+	watchBuildName, err = os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	watchBuildName = filepath.Base(watchBuildName)
+}
+
+func initWatcher() {
+	var err error
+	watcher, err = fsnotify.NewWatcher()
+	if err != nil {
+		panic(err)
+	}
+	watcher.Add(".")
+	watcher.Add("scripts")
+	watcher.Add("views")
+}
+
+func cmdWatch() {
+	setWatchBuildName()
+	atexit(watchClean)
+	initWatcher()
+
 	var args []string
 	if len(flag.Args()) > 1 {
 		args = flag.Args()[1:]
 	}
 
-	name, err := os.Getwd()
-	if err != nil {
-		panic(err)
+	if build() == nil {
+		run(args)
 	}
-	name = filepath.Base(name)
-
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		panic(err)
-	}
-	var prevProc *os.Process
-	atexit(func() {
-		watcher.Close()
-		os.Remove(name)
-	})
-
-	if err = watcher.Add("."); err != nil {
-		panic(err)
-	}
-	if err = watcher.Add("views"); err != nil {
-		panic(err)
-	}
-
-	if build(name) == nil {
-		prevProc = run(prevProc, name, args)
-	}
+	// TODO: Build scripts (Babel, GopherJS, TypeScript...) and styles (LESS, SCSS, Stylus...) before and during watching.
 	for {
 		select {
 		case event := <-watcher.Events:
@@ -49,13 +57,14 @@ func cmdRun() {
 				event.Op&fsnotify.Write == fsnotify.Write ||
 				event.Op&fsnotify.Remove == fsnotify.Remove ||
 				event.Op&fsnotify.Rename == fsnotify.Rename {
-				switch filepath.Ext(event.Name) {
-				case ".go":
-					if build(name) == nil {
-						prevProc = run(prevProc, name, args)
+				if reFilenameGo.MatchString(event.Name) {
+					if build() == nil {
+						run(args)
 					}
-				case ".gohtml":
-					prevProc = run(prevProc, name, args)
+				} else if reFilenameScriptsGopherJS.MatchString(event.Name) {
+					buildScriptsGopherJS()
+				} else if reFilenameViews.MatchString(event.Name) {
+					run(args)
 				}
 			}
 		case err := <-watcher.Errors:
@@ -66,27 +75,53 @@ func cmdRun() {
 	}
 }
 
-func build(name string) error {
-	log.Println("Rebuilding...")
-	buildCmd := exec.Command("go", "build", "-o", name)
-	buildCmd.Stdout = os.Stdout
-	buildCmd.Stderr = os.Stderr
-	return buildCmd.Run()
+func build() error {
+	log.Println("Building...")
+	cmd := exec.Command("go", "build", "-o", watchBuildName)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err == nil {
+		cleanLines(1)
+	}
+	return err
 }
 
-func run(prevProc *os.Process, name string, args []string) *os.Process {
-	log.Println("Rerunning...")
-	if prevProc != nil {
-		if err := prevProc.Kill(); err != nil {
+func run(args []string) {
+	if runningProc != nil {
+		if err := runningProc.Kill(); err != nil {
 			panic(err)
 		}
 	}
-
-	runCmd := exec.Command("./"+name, args...)
-	runCmd.Stdout = os.Stdout
-	runCmd.Stderr = os.Stderr
-	if err := runCmd.Start(); err != nil {
+	cmd := exec.Command("./"+watchBuildName, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
 		panic(err)
 	}
-	return runCmd.Process
+	runningProc = cmd.Process
+}
+
+func buildScriptsGopherJS() error {
+	log.Println("Building scripts with GopherJS...")
+	cmd := exec.Command("gopherjs", "build", "./scripts", "-o", "static/main.js", "-m")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err == nil {
+		cleanLines(1)
+	}
+	return err
+}
+
+func watchClean() {
+	if watcher != nil {
+		watcher.Close()
+	}
+	if runningProc != nil {
+		runningProc.Kill()
+	}
+	if watchBuildName != "" {
+		os.Remove(watchBuildName)
+	}
 }
