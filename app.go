@@ -110,7 +110,7 @@ func Address() string {
 
 // Run starts the server.
 func Run(mm ...Middleware) {
-	parseViews()
+	initViews()
 
 	handler := wrapHandler(rt, mm...)
 	handler = contextHandle(handler)
