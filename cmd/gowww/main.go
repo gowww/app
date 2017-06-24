@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"regexp"
 
 	"github.com/alecthomas/kingpin"
@@ -13,11 +14,11 @@ import (
 )
 
 var (
-	app       = kingpin.New("gowww", "The CLI for the gowww/app framework.")
-	buildName = app.Flag("name", "The file name used for build.").Default(getBuildName()).Short('n').String()
+	app           = kingpin.New("gowww", "The CLI for the gowww/app framework.")
+	flagBuildName = app.Flag("name", "The file name used for build.").Default(getwd(false)).Short('n').String()
 
-	cmdBuild       = app.Command("build", "Create binary for app.").Alias("b")
-	cmdBuildDocker = cmdBuild.Flag("docker", "User Docker's \"golang:latest\" image to build for Linux.").Short('d').Bool()
+	cmdBuild           = app.Command("build", "Create binary for app.").Alias("b")
+	cmdBuildFlagDocker = cmdBuild.Flag("docker", "User Docker's \"golang:latest\" image to build for Linux.").Short('d').Bool()
 
 	cmdWatch = app.Command("watch", "Detect changes and rerun app.").Alias("w")
 
@@ -39,7 +40,7 @@ func main() {
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case cmdBuild.FullCommand():
-		if *cmdBuildDocker {
+		if *cmdBuildFlagDocker {
 			buildDocker()
 		} else {
 			build()
@@ -55,7 +56,7 @@ func run() {
 			panic(err)
 		}
 	}
-	cmd := exec.Command("./" + *buildName)
+	cmd := exec.Command("./" + buildName())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
@@ -75,6 +76,17 @@ func clean() {
 
 func cleanLines(n int) {
 	fmt.Printf("\033[%dA\033[0K", n)
+}
+
+func getwd(fullpath bool) string {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	if fullpath {
+		return wd
+	}
+	return filepath.Base(wd)
 }
 
 func atexit(f func()) {
