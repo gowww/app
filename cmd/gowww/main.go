@@ -14,7 +14,7 @@ import (
 
 var (
 	app       = kingpin.New("gowww", "The CLI for the gowww/app framework.")
-	buildName = app.Flag("name", "The app name used for build.").Default(getBuildName()).Short('n').String()
+	buildName = app.Flag("name", "The file name used for build.").Default(getBuildName()).Short('n').String()
 
 	cmdBuild       = app.Command("build", "Create binary for app.").Alias("b")
 	cmdBuildDocker = cmdBuild.Flag("docker", "User Docker's \"golang:latest\" image to build for Linux.").Short('d').Bool()
@@ -39,7 +39,11 @@ func main() {
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case cmdBuild.FullCommand():
-		build()
+		if *cmdBuildDocker {
+			buildDocker()
+		} else {
+			build()
+		}
 	case cmdWatch.FullCommand():
 		watch()
 	}
