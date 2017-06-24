@@ -3,12 +3,12 @@ package app
 
 import (
 	"context"
-	"flag"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 
+	"github.com/alecthomas/kingpin"
 	"github.com/gowww/compress"
 	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
@@ -19,13 +19,14 @@ import (
 var (
 	errorHandler Handler
 
-	address    = flag.String("a", ":8080", "the address to listen and serve on")
-	production = flag.Bool("p", false, "run the server in production environment")
+	address    = kingpin.Flag("address", "The address to listen and serve on.").Default(":8080").Short('a').TCP()
+	production = kingpin.Flag("production", "Run the server in production environment.").Short('p').Bool()
 	rt         = router.New()
 )
 
 func init() {
-	flag.Parse()
+	kingpin.HelpFlag.Short('h')
+	kingpin.Parse()
 
 	// Serve static content.
 	rt.Get("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
@@ -104,7 +105,7 @@ func EnvProduction() bool {
 
 // Address gives the address on which the app is running.
 func Address() string {
-	return *address
+	return (*address).String()
 }
 
 // Run starts the server.
@@ -147,7 +148,7 @@ func Run(mm ...Middleware) {
 	// Wait for shut down.
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
-	srv := &http.Server{Addr: *address, Handler: handler}
+	srv := &http.Server{Addr: (*address).String(), Handler: handler}
 	go func() {
 		<-quit
 		log.Println("Shutting down...")
