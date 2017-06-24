@@ -13,6 +13,7 @@ import (
 	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
 	"github.com/gowww/router"
+	"github.com/gowww/view"
 )
 
 // A Context contains the data for a handler.
@@ -148,16 +149,12 @@ func (c *Context) Status(code int) {
 //	.	the GlobalViewData
 //	.c	the Context
 func (c *Context) View(name string, data ...ViewData) {
-	d := make(ViewData)
-	for k, v := range globalViewData {
-		d[k] = v
-	}
+	d := view.Data{"c": c}
 	for _, dt := range data {
 		for k, v := range dt {
 			d[k] = v
 		}
 	}
-	d["c"] = c
 	err := views.ExecuteTemplate(c, name, d)
 	if err != nil {
 		log.Println(err)
