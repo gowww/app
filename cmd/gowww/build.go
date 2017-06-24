@@ -2,25 +2,22 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 )
 
-func getBuildName() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
+func buildName() string {
+	if *cmdBuildFlagDocker {
+		return *flagBuildName + "_linux_amd64"
 	}
-	return filepath.Base(wd)
+	return *flagBuildName + "_" + runtime.GOOS + "_" + runtime.GOARCH
 }
 
 func build() error {
 	log.Println("Building...")
-	cmd := exec.Command("go", "build", "-o", fmt.Sprintf("%s_%s_%s", *buildName, runtime.GOOS, runtime.GOARCH))
+	cmd := exec.Command("go", "build", "-o", buildName())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
@@ -32,15 +29,10 @@ func build() error {
 
 func buildDocker() error {
 	log.Println("Building with Docker...")
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	buildName := *buildName + "_linux_amd64"
-	cmd := exec.Command("docker", "run", "--rm", "-v", wd+":/go/src/"+buildName, "-w", "/go/src/"+buildName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName)
+	cmd := exec.Command("docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*flagBuildName, "-w", "/go/src/"+*flagBuildName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err = cmd.Run()
+	err := cmd.Run()
 	if err == nil {
 		cleanLines(1)
 	}
