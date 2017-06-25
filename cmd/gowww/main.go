@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	app           = kingpin.New("gowww", "The CLI for the gowww/app framework.")
-	flagBuildName = app.Flag("name", "The file name used for build.").Default(getwd(false)).Short('n').String()
+	cmd         = kingpin.New("gowww", "The CLI for the gowww/app framework.")
+	cmdFlagName = cmd.Flag("name", "The file name used for build.").Default(getwd(false)).Short('n').String()
 
-	cmdBuild           = app.Command("build", "Create binary for app.").Alias("b")
+	cmdBuild           = cmd.Command("build", "Create binary for app.").Alias("b")
 	cmdBuildFlagDocker = cmdBuild.Flag("docker", "User Docker's \"golang:latest\" image to build for Linux.").Short('d').Bool()
 
-	cmdWatch = app.Command("watch", "Detect changes and rerun app.").Alias("w")
+	cmdWatch = cmd.Command("watch", "Detect changes and rerun app.").Alias("w")
 
 	watcher     *fsnotify.Watcher
 	runningProc *os.Process
@@ -31,14 +31,14 @@ var (
 )
 
 func init() {
-	app.HelpFlag.Short('h')
+	cmd.HelpFlag.Short('h')
 }
 
 func main() {
 	defer clean()
 	atexit(clean)
 
-	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+	switch kingpin.MustParse(cmd.Parse(os.Args[1:])) {
 	case cmdBuild.FullCommand():
 		if *cmdBuildFlagDocker {
 			buildDocker()

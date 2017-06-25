@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/alecthomas/kingpin"
 	"github.com/gowww/compress"
@@ -26,7 +27,9 @@ var (
 
 func init() {
 	kingpin.HelpFlag.Short('h')
-	kingpin.Parse()
+	if !strings.HasSuffix(os.Args[0], ".test") { // It's not a test: parse flags.
+		kingpin.Parse()
+	}
 
 	// Serve static content.
 	rt.Get("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
