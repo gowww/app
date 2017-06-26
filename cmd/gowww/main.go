@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/alecthomas/kingpin"
+	"github.com/arthurwhite/kingpin"
 	"github.com/fsnotify/fsnotify"
 )
 
