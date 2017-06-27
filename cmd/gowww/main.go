@@ -2,6 +2,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,18 +10,12 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/arthurwhite/kingpin"
 	"github.com/fsnotify/fsnotify"
 )
 
 var (
-	cmd         = kingpin.New("gowww", "The CLI for the gowww/app framework.")
-	cmdFlagName = cmd.Flag("name", "The file name used for build.").Default(getwd(false)).Short('n').String()
-
-	cmdBuild           = cmd.Command("build", "Create binary for app.").Alias("b")
-	cmdBuildFlagDocker = cmdBuild.Flag("docker", "User Docker's \"golang:latest\" image to build for Linux.").Short('d').Bool()
-
-	cmdWatch = cmd.Command("watch", "Detect changes and rerun app.").Alias("w")
+	flagName        = flag.String("name", getwd(false), "The file name used for build.")
+	flagBuildDocker = flag.Bool("docker", false, `User Docker's "golang:latest" image to build for Linux.`)
 
 	watcher     *fsnotify.Watcher
 	runningProc *os.Process
@@ -30,23 +25,23 @@ var (
 	reFilenameViews           = regexp.MustCompile(`^views/[0-9A-Za-z_-]+.gohtml$`)
 )
 
-func init() {
-	cmd.HelpFlag.Short('h')
+func flagParse() {
+
 }
 
 func main() {
 	defer clean()
 	atexit(clean)
 
-	switch kingpin.MustParse(cmd.Parse(os.Args[1:])) {
-	case cmdBuild.FullCommand():
-		if *cmdBuildFlagDocker {
-			buildDocker()
-		} else {
-			build()
-		}
-	case cmdWatch.FullCommand():
+	flag.Usage = help
+	flag.Parse()
+	switch flag.Arg(0) {
+	case "", "w", "watch":
 		watch()
+	case "b", "build":
+		build()
+	default:
+		help()
 	}
 }
 
