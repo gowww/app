@@ -21,7 +21,6 @@ Flags:
 
 	-name  The file name used for build. Default: ` + getwd(false) + `.
 
-Inside a gowww/app project, run command "gowww" to watch for changes and rerun your app.
 `)
 	os.Exit(0)
 }

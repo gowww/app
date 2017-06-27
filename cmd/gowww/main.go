@@ -36,9 +36,9 @@ func main() {
 	flag.Usage = help
 	flag.Parse()
 	switch flag.Arg(0) {
-	case "", "w", "watch":
+	case "", "watch":
 		watch()
-	case "b", "build":
+	case "build":
 		build()
 	default:
 		help()
