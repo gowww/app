@@ -9,10 +9,10 @@ import (
 )
 
 func buildName() string {
-	if *cmdBuildFlagDocker {
-		return *cmdFlagName + "_linux_amd64"
+	if *flagBuildDocker {
+		return *flagName + "_linux_amd64"
 	}
-	return *cmdFlagName + "_" + runtime.GOOS + "_" + runtime.GOARCH
+	return *flagName + "_" + runtime.GOOS + "_" + runtime.GOARCH
 }
 
 func build() error {
@@ -29,7 +29,7 @@ func build() error {
 
 func buildDocker() error {
 	log.Println("Building with Docker...")
-	cmd := exec.Command("docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*cmdFlagName, "-w", "/go/src/"+*cmdFlagName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
+	cmd := exec.Command("docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*flagName, "-w", "/go/src/"+*flagName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
