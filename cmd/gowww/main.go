@@ -17,6 +17,7 @@ var (
 	flagName        = flag.String("name", getwd(false), "The file name used for build.")
 	flagBuildDocker = flag.Bool("docker", false, `User Docker's "golang:latest" image to build for Linux.`)
 
+	subprocArgs []string
 	watcher     *fsnotify.Watcher
 	runningProc *os.Process
 
@@ -35,6 +36,14 @@ func main() {
 
 	flag.Usage = help
 	flag.Parse()
+
+	// Pass args after "--" to subprocess.
+	for i := 0; i < len(os.Args); i++ {
+		if os.Args[i] == "--" {
+			subprocArgs = os.Args[i+1:]
+		}
+	}
+
 	switch flag.Arg(0) {
 	case "", "watch":
 		watch()
@@ -51,7 +60,7 @@ func run() {
 			panic(err)
 		}
 	}
-	cmd := exec.Command("./" + buildName())
+	cmd := exec.Command("./"+buildName(), subprocArgs...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
