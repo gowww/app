@@ -26,10 +26,6 @@ var (
 	reFilenameViews           = regexp.MustCompile(`^views/[0-9A-Za-z_-]+.gohtml$`)
 )
 
-func flagParse() {
-
-}
-
 func main() {
 	defer clean()
 	atexit(clean)
