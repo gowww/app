@@ -245,6 +245,6 @@ func (c *Context) Panic(err error) {
 }
 
 // Error returns the error value stored in request's context after a recovering or a Context.Error call.
-func (c *Context) Error() string {
-	return fmt.Sprintf("%v", fatal.Error(c.Req))
+func (c *Context) Error() error {
+	return fmt.Errorf("%v", fatal.Error(c.Req))
 }
