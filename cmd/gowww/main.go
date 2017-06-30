@@ -15,7 +15,7 @@ import (
 
 var (
 	flagName        = flag.String("name", getwd(false), "The file name used for build.")
-	flagBuildDocker = flag.Bool("docker", false, `User Docker's "golang:latest" image to build for Linux.`)
+	flagBuildDocker = flag.Bool("docker", false, `Use Docker's "golang:latest" image to build for Linux.`)
 
 	subprocArgs []string
 	watcher     *fsnotify.Watcher
