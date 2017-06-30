@@ -24,15 +24,15 @@ type Context struct {
 
 // contextHandle wraps the router for setting headers and deferring their write.
 func contextHandle(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cw := &contextWriter{ResponseWriter: w}
+	return Handler(func(c *Context) {
+		cw := &contextWriter{ResponseWriter: c.Res}
 		defer func() {
 			if cw.status != 0 {
-				w.WriteHeader(cw.status)
+				c.Res.WriteHeader(cw.status)
 			}
 		}()
 		cw.Header().Set("Connection", "keep-alive")
-		h.ServeHTTP(cw, r)
+		h.ServeHTTP(cw, c.Req)
 	})
 }
 
@@ -221,7 +221,7 @@ func (c *Context) Fmtn(n interface{}) string {
 	return i18n.Fmtn(rt.Locale, n)
 }
 
-// Push initiates an HTTP/2 server push with an Accept-Encoding header.
+// Push initiates an HTTP/2 server push.
 // See net/http.Pusher for documentation.
 func (c *Context) Push(target string, opts *http.PushOptions) {
 	if pusher, ok := c.Res.(http.Pusher); ok {
