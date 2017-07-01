@@ -53,5 +53,3 @@ func buildStylesStylus(file string) error {
 	return build("Building styles with Stylus...",
 		"stylus", file, "--out", "static/styles", "--compress", "--sourcemap")
 }
-
-// TODO: Build scripts (Babel, TypeScript...) and styles (LESS, SCSS...) before and during watching.

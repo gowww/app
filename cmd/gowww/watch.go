@@ -40,13 +40,14 @@ func watch() {
 						buildScriptsGopherJS()
 					}
 					// TODO: Babel, CoffeeScript, TypeScript...
-				} else if strings.HasPrefix(event.Name, "styles/") {
-					if !strings.Contains(event.Name, "partial") && !strings.Contains(event.Name, "mixin") && filepath.Base(event.Name)[0] != '_' {
-						if strings.HasSuffix(event.Name, ".styl") {
-							buildStylesStylus(event.Name)
-						}
-						// TODO: LESS, SASS, SCSS...
+				} else if strings.HasPrefix(event.Name, "styles/") &&
+					!strings.Contains(event.Name, "mixin") &&
+					!strings.Contains(event.Name, "partial") &&
+					filepath.Base(event.Name)[0] != '_' {
+					if strings.HasSuffix(event.Name, ".styl") {
+						buildStylesStylus(event.Name)
 					}
+					// TODO: LESS, SASS, SCSS...
 				} else if strings.HasPrefix(event.Name, "views/") {
 					run()
 				} else if strings.HasSuffix(event.Name, ".go") && !strings.HasSuffix(event.Name, "_test.go") {
