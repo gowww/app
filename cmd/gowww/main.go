@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"regexp"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -20,10 +19,6 @@ var (
 	subprocArgs []string
 	watcher     *fsnotify.Watcher
 	runningProc *os.Process
-
-	reFilenameGo              = regexp.MustCompile(`^[0-9A-Za-z_-]+[^_test].go$`)
-	reFilenameScriptsGopherJS = regexp.MustCompile(`^scripts/[0-9A-Za-z_-]+[^_test].go$`)
-	reFilenameViews           = regexp.MustCompile(`^views/[0-9A-Za-z_-]+.gohtml$`)
 )
 
 func main() {
@@ -44,7 +39,7 @@ func main() {
 	case "", "watch":
 		watch()
 	case "build":
-		build()
+		buildGo()
 	default:
 		help()
 	}
@@ -75,7 +70,9 @@ func clean() {
 }
 
 func cleanLines(n int) {
-	fmt.Printf("\033[%dA\033[0K", n)
+	for i := 0; i < n; i++ {
+		fmt.Print("\033[1A\033[0K")
+	}
 }
 
 func getwd(fullpath bool) string {
