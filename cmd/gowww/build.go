@@ -12,7 +12,15 @@ func buildName() string {
 	if *flagBuildDocker {
 		return *flagName + "_linux_amd64"
 	}
-	return *flagName + "_" + runtime.GOOS + "_" + runtime.GOARCH
+	goos, ok := os.LookupEnv("GOOS")
+	if !ok {
+		goos = runtime.GOOS
+	}
+	goarch, ok := os.LookupEnv("GOARCH")
+	if !ok {
+		goarch = runtime.GOARCH
+	}
+	return *flagName + "_" + goos + "_" + goarch
 }
 
 func build() error {
