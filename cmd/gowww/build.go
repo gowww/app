@@ -23,40 +23,35 @@ func buildName() string {
 	return *flagName + "_" + goos + "_" + goarch
 }
 
-func build() error {
-	log.Println("Building...")
-	cmd := exec.Command("go", "build", "-o", buildName())
-	cmd.Stdout = os.Stdout
+func build(info string, cmdName string, cmdArgs ...string) error {
+	log.Println(info)
+	cmd := exec.Command(cmdName, cmdArgs...)
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err == nil {
 		cleanLines(1)
 	}
 	return err
+}
+
+func buildGo() error {
+	return build("Building...",
+		"go", "build", "-o", buildName())
 }
 
 func buildDocker() error {
-	log.Println("Building with Docker...")
-	cmd := exec.Command("docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*flagName, "-w", "/go/src/"+*flagName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err == nil {
-		cleanLines(1)
-	}
-	return err
+	return build("Building with Docker...",
+		"docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*flagName, "-w", "/go/src/"+*flagName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
 }
 
 func buildScriptsGopherJS() error {
-	log.Println("Building scripts with GopherJS...")
-	cmd := exec.Command("gopherjs", "build", "./scripts", "-o", "static/main.js", "-m")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err == nil {
-		cleanLines(1)
-	}
-	return err
+	return build("Building scripts with GopherJS...",
+		"gopherjs", "build", "./scripts", "--output", "static/scripts/main.js", "--minify")
 }
 
-// TODO: Build scripts (Babel, TypeScript...) and styles (LESS, SCSS, Stylus...) before and during watching.
+func buildStylesStylus(file string) error {
+	return build("Building styles with Stylus...",
+		"stylus", file, "--out", "static/styles", "--compress", "--sourcemap")
+}
+
+// TODO: Build scripts (Babel, TypeScript...) and styles (LESS, SCSS...) before and during watching.
