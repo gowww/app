@@ -4,6 +4,7 @@ package app
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,10 +15,12 @@ import (
 	"github.com/gowww/i18n"
 	gowwwlog "github.com/gowww/log"
 	"github.com/gowww/router"
+	"github.com/gowww/secure"
 )
 
 var (
 	errorHandler Handler
+	encrypter    secure.Encrypter
 
 	address    = flag.String("a", ":8080", "The address to listen and serve on.")
 	production = flag.Bool("p", false, "Run the server in production environment.")
@@ -95,6 +98,24 @@ func Error(handler Handler) {
 		panic(`app: "internal error" handler set multiple times`)
 	}
 	errorHandler = handler
+}
+
+// Secret sets the secret key used for encryption.
+// The key must be 32 bytes long.
+func Secret(key string) {
+	var err error
+	encrypter, err = secure.NewEncrypter(key)
+	if err != nil {
+		panic(fmt.Errorf("app: %v", err))
+	}
+}
+
+// Encrypter returns the global encrypter.
+func Encrypter() secure.Encrypter {
+	if encrypter == nil {
+		panic("app: no secret key set, no encrypter")
+	}
+	return encrypter
 }
 
 // EnvProduction tells if the app is run with the production flag.

@@ -7,21 +7,21 @@ It greatly increases productivity by providing helpers at all levels while maint
 
 - [Start](#start)
 - [Routing](#routing)
-  - [Path parameters](#path-parameters)
-    - [Named](#named)
-    - [Regular expressions](#regular-expressions)
-    - [Wildcard](#wildcard)
-  - [Groups](#groups)
-  - [Errors](#errors)
+	- [Path parameters](#path-parameters)
+		- [Named](#named)
+		- [Regular expressions](#regular-expressions)
+		- [Wildcard](#wildcard)
+	- [Groups](#groups)
+	- [Errors](#errors)
 - [Context](#context)
-  - [Request](#request)
-  - [Response](#response)
-  - [Values](#values)
+	- [Request](#request)
+	- [Response](#response)
+	- [Values](#values)
 - [Internationalization](#internationalization)
 - [Views](#views)
-  - [Data](#data)
-  - [Functions](#functions)
-  - [Built-in](#built-in)
+	- [Data](#data)
+	- [Functions](#functions)
+	- [Built-in](#built-in)
 - [Static files](#static-files)
 - [Running](#running)
 - [Middlewares](#middlewares)
@@ -32,15 +32,15 @@ It greatly increases productivity by providing helpers at all levels while maint
 
 2. Install gowww/app:
 
-   ```Shell
-   go get github.com/gowww/app
-   ```
+	```Shell
+	go get github.com/gowww/app
+	```
 
 3. Import it in your new app:
 
-   ```Go
-   import github.com/gowww/app
-   ```
+	```Go
+	import github.com/gowww/app
+	```
 
 ## Routing
 
@@ -410,31 +410,31 @@ They can be set for:
 
 - The entire app:
 
-  ```Go
-  app.Run(hand1, hand2, hand3)
-  ```
+	```Go
+	app.Run(hand1, hand2, hand3)
+	```
 
 - A group:
 
-  ```Go
-  api := app.Group("/api", hand1, hand2, hand3)
-  ```
+	```Go
+	api := app.Group("/api", hand1, hand2, hand3)
+	```
 
 - A single route:
 
-  ```Go
-  api := app.Get("/", func(c *app.Context) {
-  	// Write response for GET /
-  }, hand1, hand2, hand3)
-  ```
+	```Go
+	api := app.Get("/", func(c *app.Context) {
+		// Write response for GET /
+	}, hand1, hand2, hand3)
+	```
 
 First handler wraps the second and so on.
 
 <p align="center">
-	<br><br>
-	<a href="https://godoc.org/github.com/gowww/app"><img src="https://godoc.org/github.com/gowww/app?status.svg" alt="GoDoc"></a>
-	<a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a>
-	<a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a>
-	<a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
-	<br><br>
+<br><br>
+<a href="https://godoc.org/github.com/gowww/app"><img src="https://godoc.org/github.com/gowww/app?status.svg" alt="GoDoc"></a>
+<a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a>
+<a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a>
+<a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
+<br><br>
 </p>

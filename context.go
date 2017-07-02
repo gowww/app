@@ -3,6 +3,7 @@ package app
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -173,6 +174,40 @@ func (c *Context) Redirect(url string, status int) {
 	http.Redirect(c.Res, c.Req, url, status)
 }
 
+// Cookie decrypts and returns the named cookie value from the request.
+// If cookie is not found, an empty string is returned.
+// If multiple cookies match the given name, only one cookie value will be returned.
+func (c *Context) Cookie(name string) string {
+	ck, _ := c.Req.Cookie(name)
+	if ck == nil {
+		return ""
+	}
+	val, err := base64.StdEncoding.DecodeString(ck.Value)
+	if err != nil {
+		return ck.Value
+	}
+	if encrypter == nil {
+		return string(val)
+	}
+	ck.Value, err = encrypter.DecryptString(string(val))
+	if err != nil {
+		return string(val)
+	}
+	return ck.Value
+}
+
+// SetCookie sets an encrypted cookie to the response.
+func (c *Context) SetCookie(cookie *http.Cookie) {
+	if encrypter != nil {
+		var err error
+		if cookie.Value, err = encrypter.EncryptString(cookie.Value); err != nil {
+			c.Panic(err)
+		}
+		cookie.Value = base64.StdEncoding.EncodeToString([]byte(cookie.Value))
+	}
+	http.SetCookie(c.Res, cookie)
+}
+
 // T returns the translation associated to key, for the client locale.
 func (c *Context) T(key string, a ...interface{}) string {
 	rt := i18n.RequestTranslator(c.Req)
@@ -185,7 +220,7 @@ func (c *Context) T(key string, a ...interface{}) string {
 // Tn returns the translation associated to key, for the client locale.
 // If the translation defines plural forms (zero, one, other), it uses the most appropriate.
 // All i18n.TnPlaceholder in the translation are replaced with number n.
-// When translation is not found, an empty string is returned.
+// If translation is not found, an empty string is returned.
 func (c *Context) Tn(key string, n interface{}, a ...interface{}) string {
 	rt := i18n.RequestTranslator(c.Req)
 	if rt == nil {
