@@ -103,6 +103,9 @@ func Error(handler Handler) {
 // Secret sets the secret key used for encryption.
 // The key must be 32 bytes long.
 func Secret(key string) {
+	if encrypter != nil {
+		panic("app: secret key set multiple times")
+	}
 	var err error
 	encrypter, err = secure.NewEncrypter(key)
 	if err != nil {
