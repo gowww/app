@@ -208,6 +208,11 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 	http.SetCookie(c.Res, cookie)
 }
 
+// DeleteCookie removes a cookie from the client.
+func (c *Context) DeleteCookie(name string) {
+	http.SetCookie(c.Res, &http.Cookie{Name: name, MaxAge: -1})
+}
+
 // T returns the translation associated to key, for the client locale.
 func (c *Context) T(key string, a ...interface{}) string {
 	rt := i18n.RequestTranslator(c.Req)
