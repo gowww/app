@@ -19,8 +19,9 @@ import (
 )
 
 var (
-	errorHandler Handler
-	encrypter    secure.Encrypter
+	errorHandler    Handler
+	encrypter       secure.Encrypter
+	securityOptions *secure.Options
 
 	address    = flag.String("a", ":8080", "The address to listen and serve on.")
 	production = flag.Bool("p", false, "Run the server in production environment.")
@@ -100,6 +101,15 @@ func Error(handler Handler) {
 	errorHandler = handler
 }
 
+// Secure sets security options.
+func Secure(o *secure.Options) {
+	if encrypter != nil {
+		panic("app: security options set multiple times")
+	}
+	o.EnvDevelopment = !*production
+	securityOptions = o
+}
+
 // Secret sets the secret key used for encryption.
 // The key must be 32 bytes long.
 func Secret(key string) {
@@ -137,6 +147,13 @@ func Run(mm ...Middleware) {
 
 	handler := wrapHandler(rt, mm...)
 	handler = contextHandle(handler)
+
+	// gowww/secure
+	if securityOptions != nil {
+		handler = secure.Handle(handler, securityOptions)
+	} else {
+		handler = secure.Handle(handler, &secure.Options{EnvDevelopment: !*production})
+	}
 
 	// gowww/fatal
 	if errorHandler != nil {
