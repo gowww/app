@@ -11,7 +11,7 @@ import (
 	"os/signal"
 
 	"github.com/gowww/compress"
-	"github.com/gowww/encrypt"
+	"github.com/gowww/crypto"
 	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
 	gowwwlog "github.com/gowww/log"
@@ -21,7 +21,7 @@ import (
 
 var (
 	errorHandler    Handler
-	encrypter       encrypt.Encrypter
+	encrypter       crypto.Encoder
 	securityOptions *secure.Options
 
 	address    = flag.String("a", ":8080", "The address to listen and serve on.")
@@ -118,14 +118,14 @@ func Secret(key string) {
 		panic("app: secret key set multiple times")
 	}
 	var err error
-	encrypter, err = encrypt.New(key)
+	encrypter, err = crypto.NewEncrypter([]byte(key))
 	if err != nil {
 		panic(fmt.Errorf("app: %v", err))
 	}
 }
 
 // Encrypter returns the global encrypter.
-func Encrypter() encrypt.Encrypter {
+func Encrypter() crypto.Encoder {
 	if encrypter == nil {
 		panic("app: no secret key set, no encrypter")
 	}

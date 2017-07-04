@@ -173,9 +173,10 @@ func (c *Context) Redirect(url string, status int) {
 	http.Redirect(c.Res, c.Req, url, status)
 }
 
-// Cookie decrypts and returns the named cookie value from the request.
-// If cookie is not found or the decryption failed, an empty string is returned.
+// Cookie returns the value of the named cookie.
 // If multiple cookies match the given name, only one cookie value will be returned.
+// If the secret key is set for app, value will be decrypted before returning.
+// If cookie is not found or the decryption fails, an empty string is returned.
 func (c *Context) Cookie(name string) string {
 	ck, _ := c.Req.Cookie(name)
 	if ck == nil {
@@ -184,20 +185,27 @@ func (c *Context) Cookie(name string) string {
 	if encrypter == nil {
 		return ck.Value
 	}
-	v, err := encrypter.DecryptBase64(ck.Value)
+	v, err := encrypter.DecryptBase64([]byte(ck.Value))
 	if err != nil {
+		c.DeleteCookie(name)
 		return ""
 	}
-	return v
+	return string(v)
 }
 
-// SetCookie sets an encrypted cookie to the response.
+// SetCookie sets a cookie to the response.
+// If the secret key is set for app, value will be encrypted.
+// If the app is not in a production environment, the "secure" flag will be set to false.
 func (c *Context) SetCookie(cookie *http.Cookie) {
+	if !*production {
+		cookie.Secure = false
+	}
 	if encrypter != nil {
-		var err error
-		if cookie.Value, err = encrypter.EncryptBase64(cookie.Value); err != nil {
+		v, err := encrypter.EncryptBase64([]byte(cookie.Value))
+		if err != nil {
 			c.Panic(err)
 		}
+		cookie.Value = string(v)
 	}
 	http.SetCookie(c.Res, cookie)
 }
@@ -255,7 +263,7 @@ func (c *Context) Fmtn(n interface{}) string {
 	return i18n.Fmtn(rt.Locale, n)
 }
 
-// Push initiates an HTTP/2 server push.
+// Push initiates an HTTP/2 server push if supported.
 // See net/http.Pusher for documentation.
 func (c *Context) Push(target string, opts *http.PushOptions) {
 	if pusher, ok := c.Res.(http.Pusher); ok {
