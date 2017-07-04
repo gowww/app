@@ -21,7 +21,7 @@ import (
 
 var (
 	errorHandler    Handler
-	encrypter       crypto.Encoder
+	encrypter       crypto.Encrypter
 	securityOptions *secure.Options
 
 	address    = flag.String("a", ":8080", "The address to listen and serve on.")
@@ -125,7 +125,7 @@ func Secret(key string) {
 }
 
 // Encrypter returns the global encrypter.
-func Encrypter() crypto.Encoder {
+func Encrypter() crypto.Encrypter {
 	if encrypter == nil {
 		panic("app: no secret key set, no encrypter")
 	}
