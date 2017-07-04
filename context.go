@@ -3,7 +3,6 @@ package app
 import (
 	"bufio"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -175,35 +174,30 @@ func (c *Context) Redirect(url string, status int) {
 }
 
 // Cookie decrypts and returns the named cookie value from the request.
-// If cookie is not found, an empty string is returned.
+// If cookie is not found or the decryption failed, an empty string is returned.
 // If multiple cookies match the given name, only one cookie value will be returned.
 func (c *Context) Cookie(name string) string {
 	ck, _ := c.Req.Cookie(name)
 	if ck == nil {
 		return ""
 	}
-	val, err := base64.StdEncoding.DecodeString(ck.Value)
-	if err != nil {
+	if encrypter == nil {
 		return ck.Value
 	}
-	if encrypter == nil {
-		return string(val)
-	}
-	ck.Value, err = encrypter.DecryptString(string(val))
+	v, err := encrypter.DecryptBase64(ck.Value)
 	if err != nil {
-		return string(val)
+		return ""
 	}
-	return ck.Value
+	return v
 }
 
 // SetCookie sets an encrypted cookie to the response.
 func (c *Context) SetCookie(cookie *http.Cookie) {
 	if encrypter != nil {
 		var err error
-		if cookie.Value, err = encrypter.EncryptString(cookie.Value); err != nil {
+		if cookie.Value, err = encrypter.EncryptBase64(cookie.Value); err != nil {
 			c.Panic(err)
 		}
-		cookie.Value = base64.StdEncoding.EncodeToString([]byte(cookie.Value))
 	}
 	http.SetCookie(c.Res, cookie)
 }
