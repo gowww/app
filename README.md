@@ -376,7 +376,7 @@ These function are available out of the box:
 | `tn`            | Works like `t` with plural variations (zero, one, other). See [`Context.Tn`](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                              |
 | `tnhtml`        | Works like `tn` + `thml`. See [`Context.TnHTML`](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                          |
 | `fmtn`          | Returns a formatted number with decimal and thousands marks.                                                                     | `{{fmtn 123456.123456}}`                           |
-| `safehtml`      | Returns a string that will not be escaped. Be carefull.                                                                          | `{{safehtml "<strong>word</strong>"}}`             |
+| `safehtml`      | Returns a string that will not be escaped. Be careful.                                                                           | `{{safehtml "<strong>word</strong>"}}`             |
 | `nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                    | `{{nl2br "line one\nline two"}}`                   |
 | `styles`        | Sets an HTML link to the given stylesheets.                                                                                      | `{{styles "/static/main.css" "/static/user.css"}}` |
 | `scripts`       | Sets an HTML link to the given scripts.                                                                                          | `{{scripts "/static/main.js" "/static/user.js"}}`  |
