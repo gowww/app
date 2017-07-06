@@ -74,7 +74,7 @@ app.Delete("/", func(c *app.Context) {
 
 A named parameter begins with `:` and matches any value until the next `/` in path.
 
-To retrieve the value, ask [`Context.PathValue`](https://godoc.org/github.com/gowww/app#Context.PathValue).  
+To retrieve the value, ask [Context.PathValue](https://godoc.org/github.com/gowww/app#Context.PathValue).  
 It will return the value as a string (empty if the parameter doesn't exist).
 
 Example, with a parameter `id`:
@@ -135,7 +135,7 @@ api := app.Group("/api")
 
 ### Errors
 
-You can set a custom "not found" handler with [`NotFound`](https://godoc.org/github.com/gowww/app#NotFound):
+You can set a custom "not found" handler with [NotFound](https://godoc.org/github.com/gowww/app#NotFound):
 
 ```Go
 app.NotFound(func(c *app.Context) {
@@ -144,7 +144,7 @@ app.NotFound(func(c *app.Context) {
 })
 ```
 
-The app is also recovered from panics so you can set a custom "serving error" handler (which is used only when the response is not already written) with [`Error`](https://godoc.org/github.com/gowww/app#NotFound) and retrive the recovered error value with [`Context.Error`](https://godoc.org/github.com/gowww/app#Context.Error):
+The app is also recovered from panics so you can set a custom "serving error" handler (which is used only when the response is not already written) with [Error](https://godoc.org/github.com/gowww/app#NotFound) and retrive the recovered error value with [Context.Error](https://godoc.org/github.com/gowww/app#Context.Error):
 
 ```Go
 app.Error(func(c *app.Context) {
@@ -159,12 +159,12 @@ app.Error(func(c *app.Context) {
 
 ## Context
 
-A [`Context`](https://godoc.org/github.com/gowww/app#Context) is always used inside a [`Handler`](https://godoc.org/github.com/gowww/app#Handler).  
+A [Context](https://godoc.org/github.com/gowww/app#Context) is always used inside a [Handler](https://godoc.org/github.com/gowww/app#Handler).  
 It contains the original request and response writer but provides all the necessary helpers to access them:
 
 ### Request
 
-Use [`Context.Req`](https://godoc.org/github.com/gowww/app#Context.Req) to access the original request:
+Use [Context.Req](https://godoc.org/github.com/gowww/app#Context.Req) to access the original request:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -172,8 +172,8 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.FormValue`](https://godoc.org/github.com/gowww/app#Context.FormValue) to access a value from URL or body.  
-You can also use [`Context.HasFormValue`](https://godoc.org/github.com/gowww/app#Context.HasFormValue) to check its existence:
+Use [Context.FormValue](https://godoc.org/github.com/gowww/app#Context.FormValue) to access a value from URL or body.  
+You can also use [Context.HasFormValue](https://godoc.org/github.com/gowww/app#Context.HasFormValue) to check its existence:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -185,7 +185,7 @@ app.Get("/", func(c *app.Context) {
 
 ### Response
 
-Use [`Context.Res`](https://godoc.org/github.com/gowww/app#Context.Res) to access the original response writer:
+Use [Context.Res](https://godoc.org/github.com/gowww/app#Context.Res) to access the original response writer:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -193,7 +193,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Text`](https://godoc.org/github.com/gowww/app#Context.Text) or [`Context.Bytes`](https://godoc.org/github.com/gowww/app#Context.Bytes) to send a string:
+Use [Context.Text](https://godoc.org/github.com/gowww/app#Context.Text) or [Context.Bytes](https://godoc.org/github.com/gowww/app#Context.Bytes) to send a string:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -202,7 +202,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.JSON`](https://godoc.org/github.com/gowww/app#Context.JSON) to send a JSON formatted response:
+Use [Context.JSON](https://godoc.org/github.com/gowww/app#Context.JSON) to send a JSON formatted response:
 
 ```Go
 app.Get(`/users/:id:^\d+$/files/`, func(c *app.Context) {
@@ -213,7 +213,7 @@ app.Get(`/users/:id:^\d+$/files/`, func(c *app.Context) {
 })
 ```
 
-Use [`Context.Status`](https://godoc.org/github.com/gowww/app#Context.Status) to set the response status code:
+Use [Context.Status](https://godoc.org/github.com/gowww/app#Context.Status) to set the response status code:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -221,7 +221,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.NotFound`](https://godoc.org/github.com/gowww/app#Context.NotFound) to send a "not found" response:
+Use [Context.NotFound](https://godoc.org/github.com/gowww/app#Context.NotFound) to send a "not found" response:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -229,7 +229,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Panic`](https://godoc.org/github.com/gowww/app#Context.Panic) to log an error and send a "serving error" response:
+Use [Context.Panic](https://godoc.org/github.com/gowww/app#Context.Panic) to log an error and send a "serving error" response:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -237,7 +237,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Redirect`](https://godoc.org/github.com/gowww/app#Context.Redirect) to redirect the client:
+Use [Context.Redirect](https://godoc.org/github.com/gowww/app#Context.Redirect) to redirect the client:
 
 ```Go
 app.Get("/old", func(c *app.Context) {
@@ -245,7 +245,7 @@ app.Get("/old", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Push`](https://godoc.org/github.com/gowww/app#Context.Push) to initiate an HTTP/2 server push:
+Use [Context.Push](https://godoc.org/github.com/gowww/app#Context.Push) to initiate an HTTP/2 server push:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -257,7 +257,7 @@ app.Get("/", func(c *app.Context) {
 
 You can use context values kept inside the context for future usage downstream (like views or subhandlers).
 
-Use [`Context.Set`](https://godoc.org/github.com/gowww/app#Context.Set) to set a value:
+Use [Context.Set](https://godoc.org/github.com/gowww/app#Context.Set) to set a value:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -265,7 +265,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [`Context.Get`](https://godoc.org/github.com/gowww/app#Context.Get) to retrieve a value:
+Use [Context.Get](https://godoc.org/github.com/gowww/app#Context.Get) to retrieve a value:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -275,7 +275,7 @@ app.Get("/", func(c *app.Context) {
 
 ## Internationalization
 
-To have translations accessible all over your app, use [`Localize`](https://godoc.org/github.com/gowww/app#Localize) with your locales, their translations (a map of string to string) and the default locale:
+To have translations accessible all over your app, use [Localize](https://godoc.org/github.com/gowww/app#Localize) with your locales, their translations (a map of string to string) and the default locale:
 
 ```Go
 var locales = app.Locales{
@@ -303,7 +303,7 @@ For more details, see [gowww/i18n](https://github.com/gowww/i18n).
 Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory, within `.gohtml` files.  
 They are automatically parsed during launch.
 
-Use [`Context.View`](https://godoc.org/github.com/gowww/app#Context.View) to send a view:
+Use [Context.View](https://godoc.org/github.com/gowww/app#Context.View) to send a view:
 
 ```Go
 app.Get("/", func(c *app.Context) {
@@ -313,10 +313,10 @@ app.Get("/", func(c *app.Context) {
 
 ### Data
 
-Use a [`ViewData`](https://godoc.org/github.com/gowww/app#ViewData) map to pass data to a view.  
+Use a [ViewData](https://godoc.org/github.com/gowww/app#ViewData) map to pass data to a view.  
 Note that the context is automatically stored in the view data under key `c`.
 
-You can also use [`GlobalViewData`](https://godoc.org/github.com/gowww/app#GlobalViewData) to set data for all views:
+You can also use [GlobalViewData](https://godoc.org/github.com/gowww/app#GlobalViewData) to set data for all views:
 
 
 ```Go
@@ -345,7 +345,7 @@ In *views/home.gohtml*:
 
 ### Functions
 
-Use [`GlobalViewFuncs`](https://godoc.org/github.com/gowww/app#GlobalViewFuncs) to set functions for all views:
+Use [GlobalViewFuncs](https://godoc.org/github.com/gowww/app#GlobalViewFuncs) to set functions for all views:
 
 ```Go
 app.GlobalViewFuncs(app.ViewFuncs{
@@ -380,8 +380,8 @@ In addition to the functions provided by the standard [template](https://golang.
 | `styles`        | Sets HTML link tags for the given stylesheets.                                                                                   | `{{styles "/static/main.css" "/static/user.css"}}` |
 | `t`             | Returns the translation associated to key, for the client locale.                                                                | `{{t .c "hello"}}`                                 |
 | `thtml`         | Works like `t` but returns an HTML unescaped translation. `nl2br` is applied to the result.                                      | `{{t .c "hello"}}`                                 |
-| `tn`            | Works like `t` with plural variations (zero, one, other). See [`Context.Tn`](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                              |
-| `tnhtml`        | Works like `tn` + `thml`. See [`Context.TnHTML`](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                          |
+| `tn`            | Works like `t` with plural variations (zero, one, other). See [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                              |
+| `tnhtml`        | Works like `tn` + `thml`. See [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                          |
 
 ## Static files
 
@@ -390,7 +390,7 @@ They are automatically accessible from the `/static/` path prefix.
 
 ## Running
 
-Call [`Run`](https://godoc.org/github.com/gowww/app#Run) at the end of your main function:
+Call [Run](https://godoc.org/github.com/gowww/app#Run) at the end of your main function:
 
 ```Go
 app.Run()
@@ -405,7 +405,7 @@ But you can change this address by using flag `-a` when running your app:
 
 ## Middlewares
 
-Custom middlewares can be used if they are compatible with standard interface [`net/http.Handler`](https://golang.org/pkg/net/http/#Handler).  
+Custom middlewares can be used if they are compatible with standard interface [net/http.Handler](https://golang.org/pkg/net/http/#Handler).  
 They can be set for:
 
 - The entire app:
