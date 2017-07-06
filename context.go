@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gowww/check"
 	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
 	"github.com/gowww/router"
@@ -166,6 +167,12 @@ func (c *Context) JSON(v interface{}) {
 	c.Res.Header().Set("Content-Type", "application/json")
 	enc := json.NewEncoder(c.Res)
 	enc.Encode(v)
+}
+
+// Check uses a check.Checker to validate request's data and returns errors.
+// See gowww/check for usage.
+func (c *Context) Check(checker check.Checker) check.Errors {
+	return checker.CheckRequest(c.Req)
 }
 
 // Redirect redirects the client to the url with status code.
