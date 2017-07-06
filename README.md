@@ -369,19 +369,19 @@ In *views/posts.gohtml*:
 
 In addition to the functions provided by the standard [template](https://golang.org/pkg/text/template/#hdr-Functions) package, these function are also available out of the box:
 
-| Function        | Description                                                                                                                    | Usage                                              |
-------------------|--------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
-| `envproduction` | Tells if the app is run with the production flag.                                                                              | `{{if envproduction}}Live{{else}}Testing{{end}}`   |
-| `fmtn`          | Returns a formatted number with decimal and thousands marks.                                                                   | `{{fmtn 123456.123456}}`                           |
-| `googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s).                               | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`    |
-| `nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                  | `{{nl2br "line one\nline two"}}`                   |
-| `safehtml`      | Prevents string to be escaped. Be careful.                                                                                     | `{{safehtml "<strong>word</strong>"}}`             |
-| `scripts`       | Sets HTML script tags for the given script sources.                                                                            | `{{scripts "/static/main.js" "/static/user.js"}}`  |
-| `styles`        | Sets HTML link tags for the given stylesheets.                                                                                 | `{{styles "/static/main.css" "/static/user.css"}}` |
-| `t`             | Returns the translation associated to key, for the client locale.                                                              | `{{t .c "hello"}}`                                 |
-| `thtml`         | Works like `t` but returns an HTML unescaped translation. `nl2br` is applied to the result.                                    | `{{t .c "hello"}}`                                 |
-| `tn`            | Works like `t` with plural variations (zero, one, other). See [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                              |
-| `tnhtml`        | Works like `tn` + `thml`. See [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                          |
+Function        | Description                                                                                                                    | Usage                                             
+----------------|--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------
+`envproduction` | Tells if the app is run with the production flag.                                                                              | `{{if envproduction}}Live{{else}}Testing{{end}}`  
+`fmtn`          | Returns a formatted number with decimal and thousands marks.                                                                   | `{{fmtn 123456.123456}}`                          
+`googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s).                               | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`   
+`nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                  | `{{nl2br "line one\nline two"}}`                  
+`safehtml`      | Prevents string to be escaped. Be careful.                                                                                     | `{{safehtml "<strong>word</strong>"}}`            
+`scripts`       | Sets HTML script tags for the given script sources.                                                                            | `{{scripts "/static/main.js" "/static/user.js"}}` 
+`styles`        | Sets HTML link tags for the given stylesheets.                                                                                 | `{{styles "/static/main.css" "/static/user.css"}}`
+`t`             | Returns the translation associated to key, for the client locale.                                                              | `{{t .c "hello"}}`                                
+`thtml`         | Works like `t` but returns an HTML unescaped translation. `nl2br` is applied to the result.                                    | `{{t .c "hello"}}`                                
+`tn`            | Works like `t` with plural variations (zero, one, other). See [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                             
+`tnhtml`        | Works like `tn` + `thml`. See [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                         
 
 ## Static files
 
