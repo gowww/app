@@ -202,7 +202,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-Use [Context.JSON](https://godoc.org/github.com/gowww/app#Context.JSON) to send a JSON formatted response:
+Use [Context.JSON](https://godoc.org/github.com/gowww/app#Context.JSON) to send a JSON formatted response (if implemented by argument, `JSON() interface{}` will be used):
 
 ```Go
 app.Get(`/users/:id:^\d+$/files/`, func(c *app.Context) {
