@@ -166,6 +166,14 @@ func (c *Context) View(name string, data ...ViewData) {
 func (c *Context) JSON(v interface{}) {
 	c.Res.Header().Set("Content-Type", "application/json")
 	enc := json.NewEncoder(c.Res)
+
+	// Check for JSON method.
+	if vjson, ok := v.(interface {
+		JSON() interface{}
+	}); ok {
+		enc.Encode(vjson.JSON())
+		return
+	}
 	enc.Encode(v)
 }
 
