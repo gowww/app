@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gowww/app"
+	"github.com/gowww/check"
 	"golang.org/x/text/language"
 )
 
@@ -49,4 +50,18 @@ func Example() {
 	}
 
 	app.Run()
+}
+
+func ExampleBadRequest() {
+	userChecker := check.Checker{
+		"email": {check.Required, check.Email},
+		"phone": {check.Phone},
+	}
+
+	app.Post("/users", func(c *app.Context) {
+		if c.BadRequest(userChecker) {
+			return
+		}
+		c.Status(http.StatusCreated)
+	})
 }

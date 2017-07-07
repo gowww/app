@@ -183,6 +183,19 @@ func (c *Context) Check(checker check.Checker) check.Errors {
 	return checker.CheckRequest(c.Req)
 }
 
+// BadRequest uses a check.Checker to validate request's data.
+// If there are errors, it sends them in JSON format with status 400 (Bad Request) and result is true.
+//
+func (c *Context) BadRequest(checker check.Checker) bool {
+	errs := c.Check(checker)
+	if errs.Empty() {
+		return false
+	}
+	c.Status(http.StatusBadRequest)
+	c.JSON(errs)
+	return true
+}
+
 // Redirect redirects the client to the url with status code.
 func (c *Context) Redirect(url string, status int) {
 	http.Redirect(c.Res, c.Req, url, status)
@@ -298,7 +311,6 @@ func (c *Context) NotFound() {
 // Panic logs error with stack trace and responds with the error handler if set.
 func (c *Context) Panic(err error) {
 	panic(fmt.Errorf("Failed serving %s: %v", c.Req.RemoteAddr, err))
-
 }
 
 // Error returns the error value stored in request's context after a recovering or a Context.Error call.
