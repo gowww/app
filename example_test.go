@@ -52,7 +52,7 @@ func Example() {
 	app.Run()
 }
 
-func ExampleBadRequest() {
+func ExampleContext_BadRequest() {
 	userChecker := check.Checker{
 		"email": {check.Required, check.Email},
 		"phone": {check.Phone},
