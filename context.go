@@ -157,6 +157,7 @@ func (c *Context) Status(code int) {
 // This data is always part of the rendering:
 //	.	the GlobalViewData
 //	.c	the Context
+//	.errors	the translated errors map
 func (c *Context) View(name string, data ...ViewData) {
 	mdata := mergeViewData(data)
 	mdata["c"] = c
@@ -192,8 +193,7 @@ func (c *Context) JSON(v interface{}) {
 	}
 }
 
-// Check uses a check.Checker to validate request's data and store errors in the context.
-// It also returns the result: true if check pass, false if it fails.
+// Check uses a check.Checker to validate request's data and always returns the non-nil errors map.
 func (c *Context) Check(checker check.Checker) check.Errors {
 	return checker.CheckRequest(c.Req)
 }
@@ -203,11 +203,10 @@ func (c *Context) TErrors(errs check.Errors) check.TranslatedErrors {
 	return errs.T(i18n.RequestTranslator(c.Req))
 }
 
-// BadRequest uses a check.Checker to validate request's data.
-// If there are errors, it responses with status 400 Bad Request and result is true.
+// BadRequest uses a check.Checker to validate request form data, and a view name to execute on fail.
+// If you don't provide a view name (empty string), the response will be a JSON errors map.
 //
-// If the view name isn't provided (empty string), the response will be a JSON representation of errors.
-// Othwise, the translated errors will be stored under the "errors" view data key.
+// If the check fails, it sets the status to "400 Bad Request" and returns true, allowing you to exit from the handler.
 func (c *Context) BadRequest(checker check.Checker, view string, data ...ViewData) bool {
 	errs := c.Check(checker)
 	if errs.Empty() {
