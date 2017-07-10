@@ -6,15 +6,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"net"
 	"net/http"
+
+	"golang.org/x/text/language"
 
 	"github.com/gowww/check"
 	"github.com/gowww/fatal"
 	"github.com/gowww/i18n"
 	"github.com/gowww/router"
-	"github.com/gowww/view"
+)
+
+type responseType int
+
+// Response content types.
+const (
+	HTML responseType = iota
+	JSON
 )
 
 // A Context contains the data for a handler.
@@ -150,49 +158,59 @@ func (c *Context) Status(code int) {
 //	.	the GlobalViewData
 //	.c	the Context
 func (c *Context) View(name string, data ...ViewData) {
-	d := view.Data{"c": c}
-	for _, dt := range data {
-		for k, v := range dt {
-			d[k] = v
-		}
-	}
-	err := views.ExecuteTemplate(c, name, d)
+	data = append(data, ViewData{"c": c})
+	err := views.ExecuteTemplate(c, name, mergeViewData(data))
 	if err != nil {
-		log.Println(err)
+		c.Panic(err)
 	}
 }
 
 // JSON writes the response with a marshalled JSON.
+// If v has a JSON() interface{} method, it will be used.
 func (c *Context) JSON(v interface{}) {
 	c.Res.Header().Set("Content-Type", "application/json")
 	enc := json.NewEncoder(c.Res)
-
-	// Check for JSON method.
 	if vjson, ok := v.(interface {
 		JSON() interface{}
 	}); ok {
-		enc.Encode(vjson.JSON())
+		if err := enc.Encode(vjson.JSON()); err != nil {
+			c.Panic(err)
+		}
 		return
 	}
-	enc.Encode(v)
+	if err := enc.Encode(v); err != nil {
+		c.Panic(err)
+	}
 }
 
-// Check uses a check.Checker to validate request's data and returns errors.
-// See gowww/check for usage.
+// Check uses a check.Checker to validate request's data and store errors in the context.
+// It also returns the result: true if check pass, false if it fails.
 func (c *Context) Check(checker check.Checker) check.Errors {
 	return checker.CheckRequest(c.Req)
 }
 
+// TErrors returns translated checking errors.
+func (c *Context) TErrors(errs check.Errors) map[string][]string {
+	return errs.Translate(i18n.RequestTranslator(c.Req))
+}
+
 // BadRequest uses a check.Checker to validate request's data.
-// If there are errors, it sends them in JSON format with status 400 (Bad Request) and result is true.
+// If there are errors, it responses with status 400 Bad Request and result is true.
 //
-func (c *Context) BadRequest(checker check.Checker) bool {
-	errs := c.Check(checker)
+// If the view name isn't provided (empty string), the response will be a JSON representation of errors.
+// Othwise, the translated errors will be stored under the "errors" view data key.
+func (c *Context) BadRequest(checker check.Checker, view string, data ...ViewData) bool {
+	errs := checker.CheckRequest(c.Req)
 	if errs.Empty() {
 		return false
 	}
 	c.Status(http.StatusBadRequest)
-	c.JSON(errs)
+	if view == "" {
+		c.JSON(errs)
+	} else {
+		data = append(data, ViewData{"errors": errs})
+		c.View(view, data...)
+	}
 	return true
 }
 
@@ -256,12 +274,12 @@ func (c *Context) T(key string, a ...interface{}) string {
 // If the translation defines plural forms (zero, one, other), it uses the most appropriate.
 // All i18n.TnPlaceholder in the translation are replaced with number n.
 // If translation is not found, an empty string is returned.
-func (c *Context) Tn(key string, n interface{}, a ...interface{}) string {
+func (c *Context) Tn(key string, n int, args ...interface{}) string {
 	rt := i18n.RequestTranslator(c.Req)
 	if rt == nil {
 		return fmt.Sprintf("[%v]", key)
 	}
-	return rt.Tn(key, n, a...)
+	return rt.Tn(key, n, args...)
 }
 
 // THTML works like T but returns an HTML unescaped translation. An "nl2br" function is applied to the result.
@@ -274,21 +292,21 @@ func (c *Context) THTML(key string, a ...interface{}) template.HTML {
 }
 
 // TnHTML works like Tn but returns an HTML unescaped translation. An "nl2br" function is applied to the result.
-func (c *Context) TnHTML(key string, n interface{}, a ...interface{}) template.HTML {
+func (c *Context) TnHTML(key string, n int, args ...interface{}) template.HTML {
 	rt := i18n.RequestTranslator(c.Req)
 	if rt == nil {
 		return template.HTML(fmt.Sprintf("[%v]", key))
 	}
-	return rt.TnHTML(key, n, a...)
+	return rt.TnHTML(key, n, args...)
 }
 
-// Fmtn returns a formatted number with decimal and thousands marks.
-func (c *Context) Fmtn(n interface{}) string {
+// FmtNumber returns a formatted number with decimal and thousands marks.
+func (c *Context) FmtNumber(n interface{}) string {
 	rt := i18n.RequestTranslator(c.Req)
 	if rt == nil {
-		return fmt.Sprintf("[%v]", n)
+		return i18n.FmtNumber(language.English, n)
 	}
-	return i18n.Fmtn(rt.Locale, n)
+	return i18n.FmtNumber(rt.Locale(), n)
 }
 
 // Push initiates an HTTP/2 server push if supported.

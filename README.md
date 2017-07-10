@@ -275,10 +275,12 @@ app.Get("/", func(c *app.Context) {
 
 ## Internationalization
 
+Internationalization is handled by the [gowww/i18n](https://godoc.org/github.com/gowww/i18n) package.
+
 To have translations accessible all over your app, use [Localize](https://godoc.org/github.com/gowww/app#Localize) with your locales, their translations (a map of string to string) and the default locale:
 
 ```Go
-var locales = app.Locales{
+var locales = i18n.Locales{
 	language.English: {
 		"hello": "Hello!",
 	},
@@ -372,7 +374,7 @@ In addition to the functions provided by the standard [template](https://golang.
 Function        | Description                                                                                                                    | Usage                                             
 ----------------|--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------
 `envproduction` | Tells if the app is run with the production flag.                                                                              | `{{if envproduction}}Live{{else}}Testing{{end}}`  
-`fmtn`          | Returns a formatted number with decimal and thousands marks.                                                                   | `{{fmtn 123456.123456}}`                          
+`fmtnumber`     | Returns a formatted number with decimal and thousands marks.                                                                   | `{{fmtnumber 123456.123456}}`                          
 `googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s).                               | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`   
 `nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                  | `{{nl2br "line one\nline two"}}`                  
 `safehtml`      | Prevents string to be escaped. Be careful.                                                                                     | `{{safehtml "<strong>word</strong>"}}`            

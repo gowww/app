@@ -166,16 +166,8 @@ func Run(mm ...Middleware) {
 	}
 
 	// gowww/i18n
-	if confI18n != nil {
-		ll := make(i18n.Locales)
-		for lang, trans := range confI18n.Locales {
-			ll[lang] = i18n.Translations(trans)
-		}
-		var pp []i18n.Parser
-		for _, parser := range confI18n.Parsers {
-			pp = append(pp, i18n.Parser(parser))
-		}
-		handler = i18n.Handle(handler, ll, confI18n.Fallback, pp...)
+	if confI18n.Locales != nil {
+		handler = i18n.Handle(handler, confI18n.Locales, confI18n.Fallback, confI18n.Parsers...)
 	}
 
 	// gowww/compress
