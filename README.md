@@ -17,11 +17,11 @@ It greatly increases productivity by providing helpers at all levels while maint
 	- [Request](#request)
 	- [Response](#response)
 	- [Values](#values)
-- [Internationalization](#internationalization)
 - [Views](#views)
 	- [Data](#data)
 	- [Functions](#functions)
 	- [Built-in](#built-in)
+- [Internationalization](#internationalization)
 - [Static files](#static-files)
 - [Running](#running)
 - [Middlewares](#middlewares)
@@ -273,33 +273,6 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-## Internationalization
-
-Internationalization is handled by the [gowww/i18n](https://godoc.org/github.com/gowww/i18n) package.
-
-To have translations accessible all over your app, use [Localize](https://godoc.org/github.com/gowww/app#Localize) with your locales, their translations (a map of string to string) and the default locale:
-
-```Go
-var locales = i18n.Locales{
-	language.English: {
-		"hello": "Hello!",
-	},
-	language.French: {
-		"hello": "Bonjour !",
-	},
-}
-
-app.Localize(locales, language.English)
-```
-
-In your views, use function `t` (or its variants: `tn`, `thtml`, `tnhtml`) to get a translation:
-
-```HTML
-<h1>{{t .c "hello"}}</h1>
-```
-
-For more details, see [gowww/i18n](https://github.com/gowww/i18n).
-
 ## Views
 
 Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory, within `.gohtml` files.  
@@ -316,10 +289,9 @@ app.Get("/", func(c *app.Context) {
 ### Data
 
 Use a [ViewData](https://godoc.org/github.com/gowww/app#ViewData) map to pass data to a view.  
-Note that the context is automatically stored in the view data under key `c`.
+Note that the [Context](https://godoc.org/github.com/gowww/app#Context) is automatically stored in the view data under key `c`.
 
 You can also use [GlobalViewData](https://godoc.org/github.com/gowww/app#GlobalViewData) to set data for all views:
-
 
 ```Go
 app.GlobalViewData(app.ViewData{
@@ -371,19 +343,44 @@ In *views/posts.gohtml*:
 
 In addition to the functions provided by the standard [template](https://golang.org/pkg/text/template/#hdr-Functions) package, these function are also available out of the box:
 
-Function        | Description                                                                                                                    | Usage                                             
-----------------|--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------
-`envproduction` | Tells if the app is run with the production flag.                                                                              | `{{if envproduction}}Live{{else}}Testing{{end}}`  
-`fmtnumber`     | Returns a formatted number with decimal and thousands marks.                                                                   | `{{fmtnumber 123456.123456}}`                          
-`googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s).                               | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`   
-`nl2br`         | Converts `\n` to HTML `<br>`.                                                                                                  | `{{nl2br "line one\nline two"}}`                  
-`safehtml`      | Prevents string to be escaped. Be careful.                                                                                     | `{{safehtml "<strong>word</strong>"}}`            
-`scripts`       | Sets HTML script tags for the given script sources.                                                                            | `{{scripts "/static/main.js" "/static/user.js"}}` 
-`styles`        | Sets HTML link tags for the given stylesheets.                                                                                 | `{{styles "/static/main.css" "/static/user.css"}}`
-`t`             | Returns the translation associated to key, for the client locale.                                                              | `{{t .c "hello"}}`                                
-`thtml`         | Works like `t` but returns an HTML unescaped translation. `nl2br` is applied to the result.                                    | `{{t .c "hello"}}`                                
-`tn`            | Works like `t` with plural variations (zero, one, other). See [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn). | `{{tn .c "item" 12}}`                             
-`tnhtml`        | Works like `tn` + `thml`. See [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML).                         | `{{tnhtml .c "item" 12}}`                         
+Function        | Description                                                                                      | Usage                                             
+----------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------
+`envproduction` | Tells if the app is run with the production flag.                                                | `{{if envproduction}}Live{{else}}Testing{{end}}`  
+`googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`   
+`nl2br`         | Converts `\n` to HTML `<br>`.                                                                    | `{{nl2br "line one\nline two"}}`                  
+`safehtml`      | Prevents string to be escaped. Be careful.                                                       | `{{safehtml "<strong>word</strong>"}}`            
+`scripts`       | Sets HTML script tags for the given script sources.                                              | `{{scripts "/static/main.js" "/static/user.js"}}` 
+`styles`        | Sets HTML link tags for the given stylesheets.                                                   | `{{styles "/static/main.css" "/static/user.css"}}`
+
+## Internationalization
+
+Internationalization is handled by [gowww/i18n](https://godoc.org/github.com/gowww/i18n).
+
+1. Make a map for your translations (a map of string to string, for each language tag):
+
+	```Go
+	var locales = i18n.Locales{
+		language.English: {
+			"hello": "Hello!",
+		},
+		language.French: {
+			"hello": "Bonjour !",
+		},
+	}
+	```
+
+2. Use [Localize](https://godoc.org/github.com/gowww/app#Localize) to register them with the default locale (used for fallback):
+
+	```Go
+	app.Localize(locales, language.English)
+	```
+
+3. Methods [Context.T](https://godoc.org/github.com/gowww/app#Context.T), [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn), [Context.THTML](https://godoc.org/github.com/gowww/app#Context.THTML) and [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML) are now operational.  
+   As the [Context](https://godoc.org/github.com/gowww/app#Context) is always part of the view data, you can use these methods in views:
+
+	```HTML
+	<h1>{{.c.T "hello"}}</h1>
+	```
 
 ## Static files
 

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"html/template"
 	"os"
 
 	"github.com/gowww/view"
@@ -34,21 +33,6 @@ func initViews() {
 
 	view.AllHelpers["envproduction"] = func() bool {
 		return EnvProduction()
-	}
-	view.AllHelpers["fmtnumber"] = func(c *Context, n interface{}) string {
-		return c.FmtNumber(n)
-	}
-	view.AllHelpers["t"] = func(c *Context, key string, a ...interface{}) string {
-		return c.T(key, a...)
-	}
-	view.AllHelpers["thtml"] = func(c *Context, key string, a ...interface{}) template.HTML {
-		return c.THTML(key, a...)
-	}
-	view.AllHelpers["tn"] = func(c *Context, key string, n int, args ...interface{}) string {
-		return c.Tn(key, n, args...)
-	}
-	view.AllHelpers["tnhtml"] = func(c *Context, key string, n int, args ...interface{}) template.HTML {
-		return c.TnHTML(key, n, args...)
 	}
 
 	views.Funcs(view.AllHelpers).ParseDir(viewsDir)

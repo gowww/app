@@ -191,7 +191,7 @@ func (c *Context) Check(checker check.Checker) check.Errors {
 
 // TErrors returns translated checking errors.
 func (c *Context) TErrors(errs check.Errors) map[string][]string {
-	return errs.Translate(i18n.RequestTranslator(c.Req))
+	return errs.Translated(i18n.RequestTranslator(c.Req))
 }
 
 // BadRequest uses a check.Checker to validate request's data.
@@ -200,7 +200,7 @@ func (c *Context) TErrors(errs check.Errors) map[string][]string {
 // If the view name isn't provided (empty string), the response will be a JSON representation of errors.
 // Othwise, the translated errors will be stored under the "errors" view data key.
 func (c *Context) BadRequest(checker check.Checker, view string, data ...ViewData) bool {
-	errs := checker.CheckRequest(c.Req)
+	errs := c.Check(checker)
 	if errs.Empty() {
 		return false
 	}
