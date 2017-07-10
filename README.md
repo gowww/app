@@ -367,8 +367,7 @@ Validation is handled by [gowww/check](https://godoc.org/github.com/gowww/check)
 	}
 	```
 
-	The rules order is significant.  
-	So for an email address for example, it's clever to check its format before its uniqueness to avoid useless database requests.
+	The rules order is significant so for example, it's smarter to check the format of a value before its uniqueness, avoiding some useless database requests.
 
 2. Check the request against the checker:
 
