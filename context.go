@@ -158,8 +158,17 @@ func (c *Context) Status(code int) {
 //	.	the GlobalViewData
 //	.c	the Context
 func (c *Context) View(name string, data ...ViewData) {
-	data = append(data, ViewData{"c": c})
-	err := views.ExecuteTemplate(c, name, mergeViewData(data))
+	mdata := mergeViewData(data)
+	mdata["c"] = c
+	switch errs := mdata["errors"].(type) {
+	case check.TranslatedErrors:
+		break
+	case check.Errors:
+		mdata["errors"] = c.TErrors(errs)
+	default:
+		mdata["errors"] = make(check.TranslatedErrors)
+	}
+	err := views.ExecuteTemplate(c, name, mdata)
 	if err != nil {
 		c.Panic(err)
 	}
@@ -190,8 +199,8 @@ func (c *Context) Check(checker check.Checker) check.Errors {
 }
 
 // TErrors returns translated checking errors.
-func (c *Context) TErrors(errs check.Errors) map[string][]string {
-	return errs.Translated(i18n.RequestTranslator(c.Req))
+func (c *Context) TErrors(errs check.Errors) check.TranslatedErrors {
+	return errs.T(i18n.RequestTranslator(c.Req))
 }
 
 // BadRequest uses a check.Checker to validate request's data.
@@ -208,7 +217,7 @@ func (c *Context) BadRequest(checker check.Checker, view string, data ...ViewDat
 	if view == "" {
 		c.JSON(errs)
 	} else {
-		data = append(data, ViewData{"errors": errs})
+		data = append(data, ViewData{"errors": c.TErrors(errs)})
 		c.View(view, data...)
 	}
 	return true

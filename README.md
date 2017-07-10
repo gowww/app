@@ -21,6 +21,7 @@ It greatly increases productivity by providing helpers at all levels while maint
 	- [Data](#data)
 	- [Functions](#functions)
 	- [Built-in](#built-in)
+- [Validation](#validation)
 - [Internationalization](#internationalization)
 - [Static files](#static-files)
 - [Running](#running)
@@ -352,6 +353,63 @@ Function        | Description                                                   
 `scripts`       | Sets HTML script tags for the given script sources.                                              | `{{scripts "/static/main.js" "/static/user.js"}}` 
 `styles`        | Sets HTML link tags for the given stylesheets.                                                   | `{{styles "/static/main.css" "/static/user.css"}}`
 
+## Validation
+
+Validation is handled by [gowww/check](https://godoc.org/github.com/gowww/check).
+
+1. Make a [Checker](https://godoc.org/github.com/gowww/check#Checker) with [rules](https://github.com/gowww/check#rules) for keys:
+
+	```Go
+	userChecker := check.Checker{
+		"email":   {check.Required, check.Email, check.Unique(db, "users", "email", "?")},
+		"phone":   {check.Phone},
+		"picture": {check.MaxFileSize(5000), check.Image},
+	}
+	```
+
+	The rules order is significant.  
+	So for an email address for example, it's clever to check its format before its uniqueness to avoid useless database requests.
+
+2. Check the request against the checker:
+
+	```Go
+	errs := c.Check(userChecker)
+	```
+
+3. Handle errors:
+
+	```Go
+	if errs.NotEmpty() {
+		c.Status(http.StatusBadRequest)
+		c.View(view, ViewData{"errors": c.TErrors(errs)})
+		return
+	}
+	```
+
+Usually, when a check fails, you just want to send a response with error messages.  
+Here comes the [BadRequest](https://godoc.org/github.com/gowww/app#BadRequest) shortcut which receives a checker and a view name.
+
+If the check fails, it sets the status to "400 Bad Request" and returns `true`, allowing you to exit from the handler.  
+If you don't provide a view name (empty string), the response will be a JSON errors map:
+
+```Go
+app.Post("/join", func(c *app.Context) {
+	if c.BadRequest(userChecker, "join") {
+		return
+	}
+	c.Redirect("/user", http.StatusSeeOther)
+})
+```
+
+In views, you can retrive errors under key `errors` which is always present, even if the errors map is empty:
+
+```HTML
+<input type="email" name="email" value="{{.email}}">
+{{if .errors.Has "email"}}
+	<div class="error">{{.errors.First "email"}}</div>
+{{end}}
+```
+
 ## Internationalization
 
 Internationalization is handled by [gowww/i18n](https://godoc.org/github.com/gowww/i18n).
@@ -359,7 +417,7 @@ Internationalization is handled by [gowww/i18n](https://godoc.org/github.com/gow
 1. Make a map for your translations (a map of string to string, for each language tag):
 
 	```Go
-	var locales = i18n.Locales{
+	locales := i18n.Locales{
 		language.English: {
 			"hello": "Hello!",
 		},
