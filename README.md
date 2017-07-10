@@ -276,7 +276,7 @@ app.Get("/", func(c *app.Context) {
 
 ## Views
 
-Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory, within `.gohtml` files.  
+Views are standard [Go HTML templates](https://golang.org/pkg/html/template/) and must be stored inside the `views` directory.  
 They are automatically parsed during launch.
 
 Use [Context.View](https://godoc.org/github.com/gowww/app#Context.View) to send a view:
