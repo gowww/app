@@ -386,10 +386,10 @@ Validation is handled by [gowww/check](https://godoc.org/github.com/gowww/check)
 	```
 
 Usually, when a check fails, you just want to send a response with error messages.  
-Here comes the [BadRequest](https://godoc.org/github.com/gowww/app#BadRequest) shortcut which receives a checker and a view name.
+Here comes the [BadRequest](https://godoc.org/github.com/gowww/app#BadRequest) shortcut which receives a checker and a view name.  
+If you don't provide a view name (empty string), the response will be a JSON errors map.
 
-If the check fails, it sets the status to "400 Bad Request" and returns `true`, allowing you to exit from the handler.  
-If you don't provide a view name (empty string), the response will be a JSON errors map:
+If the check fails, it sets the status to "400 Bad Request" and returns `true`, allowing you to exit from the handler:
 
 ```Go
 app.Post("/join", func(c *app.Context) {
@@ -400,7 +400,7 @@ app.Post("/join", func(c *app.Context) {
 })
 ```
 
-In views, you can retrive errors under key `errors` which is always present, even if the errors map is empty:
+In views, you can retrive translated errors under key `errors` which is always present, even if the errors map is empty:
 
 ```HTML
 <input type="email" name="email" value="{{.email}}">
