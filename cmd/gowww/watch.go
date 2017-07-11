@@ -23,47 +23,6 @@ func initWatcher() {
 	watcherAdd("views")
 }
 
-func watch() {
-	initWatcher()
-	if buildGo() == nil {
-		run()
-	}
-	for {
-		select {
-		case event := <-watcher.Events:
-			if event.Op&fsnotify.Create == fsnotify.Create ||
-				event.Op&fsnotify.Write == fsnotify.Write ||
-				event.Op&fsnotify.Remove == fsnotify.Remove ||
-				event.Op&fsnotify.Rename == fsnotify.Rename {
-				if strings.HasPrefix(event.Name, "scripts/") {
-					if strings.HasSuffix(event.Name, ".go") && !strings.HasSuffix(event.Name, "_test.go") {
-						buildScriptsGopherJS()
-					}
-					// TODO: Babel, CoffeeScript, TypeScript...
-				} else if strings.HasPrefix(event.Name, "styles/") &&
-					!strings.Contains(event.Name, "mixin") &&
-					!strings.Contains(event.Name, "partial") &&
-					filepath.Base(event.Name)[0] != '_' {
-					if strings.HasSuffix(event.Name, ".styl") {
-						buildStylesStylus(event.Name)
-					}
-					// TODO: LESS, SASS, SCSS...
-				} else if strings.HasPrefix(event.Name, "views/") {
-					run()
-				} else if strings.HasSuffix(event.Name, ".go") && !strings.HasSuffix(event.Name, "_test.go") {
-					if buildGo() == nil {
-						run()
-					}
-				}
-			}
-		case err := <-watcher.Errors:
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
-
 // watcherAdd adds a directory and its subdirectories to the watcher.
 func watcherAdd(dir string) {
 	if watcher.Add(dir) == nil {
@@ -76,5 +35,50 @@ func watcherAdd(dir string) {
 			}
 			return watcher.Add(path)
 		})
+	}
+}
+
+func watch() {
+	initWatcher()
+	if buildGo() == nil {
+		run()
+	}
+	for {
+		select {
+		case event := <-watcher.Events:
+			if event.Op&fsnotify.Create == fsnotify.Create ||
+				event.Op&fsnotify.Write == fsnotify.Write ||
+				event.Op&fsnotify.Remove == fsnotify.Remove ||
+				event.Op&fsnotify.Rename == fsnotify.Rename {
+				watchEvent(event.Name)
+			}
+		case err := <-watcher.Errors:
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+}
+
+func watchEvent(name string) {
+	if strings.HasPrefix(name, "scripts/") {
+		if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+			buildScriptsGopherJS()
+		}
+		// TODO: Babel, CoffeeScript, TypeScript...
+	} else if strings.HasPrefix(name, "styles/") &&
+		!strings.Contains(name, "mixin") &&
+		!strings.Contains(name, "partial") &&
+		filepath.Base(name)[0] != '_' {
+		if strings.HasSuffix(name, ".styl") {
+			buildStylesStylus(name)
+		}
+		// TODO: LESS, SASS, SCSS...
+	} else if strings.HasPrefix(name, "views/") {
+		run()
+	} else if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+		if buildGo() == nil {
+			run()
+		}
 	}
 }
