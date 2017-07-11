@@ -2,23 +2,19 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/gowww/cli"
 )
 
 var (
-	flagBuild       = flag.NewFlagSet("build", flag.ExitOnError)
-	flagBuildDocker = flagBuild.Bool("docker", false, `Use Docker's "golang:latest" image to build for Linux.`)
-	flagBuildName   = flagBuild.String("name", getwd(false), "The file name used for build.")
-	flagWatch       = flag.NewFlagSet("watch", flag.ExitOnError)
+	flagBuildDocker bool
+	flagBuildName   string
 
-	subprocArgs []string
 	watcher     *fsnotify.Watcher
 	runningProc *os.Process
 )
@@ -27,29 +23,17 @@ func main() {
 	defer clean()
 	atexit(clean)
 
-	flag.Usage = help
-	flagBuild.Usage = helpBuild
-	flagWatch.Usage = helpWatch
-	flag.Parse()
+	cli.Description = "The CLI of the gowww/app framework."
 
-	// Pass args after "--" to subprocess.
-	for i := 0; i < len(os.Args); i++ {
-		if os.Args[i] == "--" {
-			subprocArgs = os.Args[i+1:]
-		}
-	}
+	cli.Command("build", build, "Create binary for app.").
+		Bool(&flagBuildDocker, "docker", false, `Use Docker's "golang:latest" image to build for Linux.`).
+		String(&flagBuildName, "name", getwd(false), "The file name used for build.")
 
-	switch flag.Arg(0) {
-	case "", "watch":
-		watch()
-	case "build":
-		flagBuild.Parse(flag.Args()[1:])
-		build()
-	case "help":
-		help()
-	default:
-		helpMain()
-	}
+	cli.Command("watch", watch, "Detect changes and rerun app.")
+
+	cli.Parse()
+
+	watch()
 }
 
 func run() {
@@ -58,7 +42,7 @@ func run() {
 			panic(err)
 		}
 	}
-	cmd := exec.Command("./"+buildName(), subprocArgs...)
+	cmd := exec.Command("./"+buildName(), cli.SubArgs()...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
@@ -73,12 +57,6 @@ func clean() {
 	}
 	if runningProc != nil {
 		runningProc.Kill()
-	}
-}
-
-func cleanLines(n int) {
-	for i := 0; i < n; i++ {
-		fmt.Print("\033[1A\033[0K")
 	}
 }
 
