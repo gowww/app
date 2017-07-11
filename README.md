@@ -145,7 +145,7 @@ app.NotFound(func(c *app.Context) {
 })
 ```
 
-The app is also recovered from panics so you can set a custom "serving error" handler (which is used only when the response is not already written) with [Error](https://godoc.org/github.com/gowww/app#NotFound) and retrive the recovered error value with [Context.Error](https://godoc.org/github.com/gowww/app#Context.Error):
+The app is also recovered from panics so you can set a custom "serving error" handler (which is used only when the response is not already written) with [Error](https://godoc.org/github.com/gowww/app#NotFound) and retrieve the recovered error value with [Context.Error](https://godoc.org/github.com/gowww/app#Context.Error):
 
 ```Go
 app.Error(func(c *app.Context) {
@@ -401,7 +401,7 @@ app.Post("/join", func(c *app.Context) {
 })
 ```
 
-In views, you can retrive the [check.TranslatedErrors](https://godoc.org/github.com/gowww/check#TranslatedErrors) map under key `errors` which is never `nil` in view data:
+In views, you can retrieve the [check.TranslatedErrors](https://godoc.org/github.com/gowww/check#TranslatedErrors) map under key `errors` which is never `nil` in view data:
 
 ```HTML
 <input type="email" name="email" value="{{.email}}">
