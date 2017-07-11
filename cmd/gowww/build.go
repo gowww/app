@@ -8,9 +8,17 @@ import (
 	"runtime"
 )
 
+func build() {
+	if *flagBuildDocker {
+		buildDocker()
+	} else {
+		buildGo()
+	}
+}
+
 func buildName() string {
 	if *flagBuildDocker {
-		return *flagName + "_linux_amd64"
+		return *flagBuildName + "_linux_amd64"
 	}
 	goos, ok := os.LookupEnv("GOOS")
 	if !ok {
@@ -20,10 +28,10 @@ func buildName() string {
 	if !ok {
 		goarch = runtime.GOARCH
 	}
-	return *flagName + "_" + goos + "_" + goarch
+	return *flagBuildName + "_" + goos + "_" + goarch
 }
 
-func build(info string, cmdName string, cmdArgs ...string) error {
+func buildExec(info string, cmdName string, cmdArgs ...string) error {
 	log.Println(info)
 	cmd := exec.Command(cmdName, cmdArgs...)
 	cmd.Stderr = os.Stderr
@@ -35,21 +43,21 @@ func build(info string, cmdName string, cmdArgs ...string) error {
 }
 
 func buildGo() error {
-	return build("Building...",
+	return buildExec("Building...",
 		"go", "build", "-o", buildName())
 }
 
 func buildDocker() error {
-	return build("Building with Docker...",
-		"docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*flagName, "-w", "/go/src/"+*flagName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
+	return buildExec("Building with Docker...",
+		"docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+*flagBuildName, "-w", "/go/src/"+*flagBuildName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
 }
 
 func buildScriptsGopherJS() error {
-	return build("Building scripts with GopherJS...",
+	return buildExec("Building scripts with GopherJS...",
 		"gopherjs", "build", "./scripts", "--output", "static/scripts/main.js", "--minify")
 }
 
 func buildStylesStylus(file string) error {
-	return build("Building styles with Stylus...",
+	return buildExec("Building styles with Stylus...",
 		"stylus", file, "--out", "static/styles", "--compress", "--sourcemap")
 }

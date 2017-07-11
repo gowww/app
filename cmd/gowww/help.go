@@ -3,11 +3,30 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 )
 
-var (
-	helpMain = `The CLI of the gowww/app framework.
+func help() {
+	switch flag.Arg(0) {
+	case "build":
+		helpBuild()
+	case "help":
+		switch flag.Arg(1) {
+		case "build":
+			helpBuild()
+		case "watch":
+			helpWatch()
+		default:
+			helpMain()
+		}
+	case "watch":
+		helpWatch()
+	default:
+		helpMain()
+	}
+}
+
+func helpMain() {
+	fmt.Print(`The CLI of the gowww/app framework.
 
 Usage:
 
@@ -22,9 +41,11 @@ Flags:
 
 	-name  The file name used for build. Default: ` + getwd(false) + `.
 
-`
+`)
+}
 
-	helpBuild = `Create binary for app.
+func helpBuild() {
+	fmt.Print(`Create binary for app.
 
 Usage:
 
@@ -33,26 +54,17 @@ Usage:
 Flags:
 
 	-docker  Use Docker's "golang:latest" image to build for Linux.
+	-name    The file name used for build.
 
-`
+`)
+}
 
-	helpWatch = `Detect changes and rerun app.
+func helpWatch() {
+	fmt.Print(`Detect changes and rerun app.
 
 Usage:
 
 	gowww watch
 
-`
-)
-
-func help() {
-	switch flag.Arg(0) {
-	case "build":
-		fmt.Print(helpBuild)
-	case "watch":
-		fmt.Print(helpWatch)
-	default:
-		fmt.Print(helpMain)
-	}
-	os.Exit(0)
+`)
 }

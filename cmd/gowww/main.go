@@ -13,8 +13,10 @@ import (
 )
 
 var (
-	flagName        = flag.String("name", getwd(false), "The file name used for build.")
-	flagBuildDocker = flag.Bool("docker", false, `Use Docker's "golang:latest" image to build for Linux.`)
+	flagBuild       = flag.NewFlagSet("build", flag.ExitOnError)
+	flagBuildDocker = flagBuild.Bool("docker", false, `Use Docker's "golang:latest" image to build for Linux.`)
+	flagBuildName   = flagBuild.String("name", getwd(false), "The file name used for build.")
+	flagWatch       = flag.NewFlagSet("watch", flag.ExitOnError)
 
 	subprocArgs []string
 	watcher     *fsnotify.Watcher
@@ -26,6 +28,8 @@ func main() {
 	atexit(clean)
 
 	flag.Usage = help
+	flagBuild.Usage = helpBuild
+	flagWatch.Usage = helpWatch
 	flag.Parse()
 
 	// Pass args after "--" to subprocess.
@@ -39,9 +43,12 @@ func main() {
 	case "", "watch":
 		watch()
 	case "build":
-		buildGo()
-	default:
+		flagBuild.Parse(flag.Args()[1:])
+		build()
+	case "help":
 		help()
+	default:
+		helpMain()
 	}
 }
 
