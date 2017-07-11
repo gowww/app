@@ -380,7 +380,7 @@ Validation is handled by [gowww/check](https://godoc.org/github.com/gowww/check)
 	```Go
 	if errs.NotEmpty() {
 		c.Status(http.StatusBadRequest)
-		c.View(view, ViewData{"errors": c.TErrors(errs)})
+		c.View(view, app.ViewData{"errors": c.TErrors(errs)})
 		return
 	}
 	```
