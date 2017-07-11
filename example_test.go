@@ -6,11 +6,12 @@ import (
 
 	"github.com/gowww/app"
 	"github.com/gowww/check"
+	"github.com/gowww/i18n"
 	"golang.org/x/text/language"
 )
 
 func Example() {
-	var locales = app.Locales{
+	var locales = i18n.Locales{
 		language.English: {
 			"hello": "Hello!",
 		},
@@ -59,7 +60,7 @@ func ExampleContext_BadRequest() {
 	}
 
 	app.Post("/users", func(c *app.Context) {
-		if c.BadRequest(userChecker) {
+		if c.BadRequest(userChecker, "") {
 			return
 		}
 		c.Status(http.StatusCreated)
