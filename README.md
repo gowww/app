@@ -357,7 +357,7 @@ Function        | Description                                                   
 
 Validation is handled by [gowww/check](https://godoc.org/github.com/gowww/check).
 
-Firstly, make a [check.Checker](https://godoc.org/github.com/gowww/check#Checker) with [rules](https://github.com/gowww/check#rules) for keys:
+Firstly, make a [Checker](https://godoc.org/github.com/gowww/check#Checker) with [rules](https://github.com/gowww/check#rules) for keys:
 
 ```Go
 userChecker := check.Checker{
@@ -375,7 +375,7 @@ Use [Context.Check](https://godoc.org/github.com/gowww/app#Context.Check) to che
 errs := c.Check(userChecker)
 ```
 
-Use [check.Errors.Empty](https://godoc.org/github.com/gowww/check#Errors.Empty) or [check.Errors.NotEmpty](https://godoc.org/github.com/gowww/check#Errors.NotEmpty) to know if there are errors and handle them like you want.  
+Use [Errors.Empty](https://godoc.org/github.com/gowww/check#Errors.Empty) or [Errors.NotEmpty](https://godoc.org/github.com/gowww/check#Errors.NotEmpty) to know if there are errors and handle them like you want.  
 You can also translate error messages with [Context.TErrors](https://godoc.org/github.com/gowww/app#Context.TErrors):
 
 ```Go
@@ -397,11 +397,11 @@ app.Post("/join", func(c *app.Context) {
 	if c.BadRequest(userChecker, "join") {
 		return
 	}
-	// Handle request confidently.
+	// Handle request confidently
 })
 ```
 
-In views, you can retrieve the [check.TranslatedErrors](https://godoc.org/github.com/gowww/check#TranslatedErrors) map under key `errors` which is never `nil` in view data:
+In views, you can retrieve the [TranslatedErrors](https://godoc.org/github.com/gowww/check#TranslatedErrors) map under key `errors` which is never `nil` in view data:
 
 ```HTML
 <input type="email" name="email" value="{{.email}}">
