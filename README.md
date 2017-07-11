@@ -357,50 +357,51 @@ Function        | Description                                                   
 
 Validation is handled by [gowww/check](https://godoc.org/github.com/gowww/check).
 
-1. Make a [Checker](https://godoc.org/github.com/gowww/check#Checker) with [rules](https://github.com/gowww/check#rules) for keys:
+Firstly, make a [check.Checker](https://godoc.org/github.com/gowww/check#Checker) with [rules](https://github.com/gowww/check#rules) for keys:
 
-	```Go
-	userChecker := check.Checker{
-		"email":   {check.Required, check.Email, check.Unique(db, "users", "email", "?")},
-		"phone":   {check.Phone},
-		"picture": {check.MaxFileSize(5000), check.Image},
-	}
-	```
+```Go
+userChecker := check.Checker{
+	"email":   {check.Required, check.Email, check.Unique(db, "users", "email", "?")},
+	"phone":   {check.Phone},
+	"picture": {check.MaxFileSize(5000), check.Image},
+}
+```
 
-	The rules order is significant so for example, it's smarter to check the format of a value before its uniqueness, avoiding some useless database requests.
+The rules order is significant so for example, it's smarter to check the format of a value before its uniqueness, avoiding some useless database requests.
 
-2. Check the request against the checker:
+Use [Context.Check](https://godoc.org/github.com/gowww/app#Context.Check) to check the request against a checker:
 
-	```Go
-	errs := c.Check(userChecker)
-	```
+```Go
+errs := c.Check(userChecker)
+```
 
-3. Handle errors:
+Use [check.Errors.Empty](https://godoc.org/github.com/gowww/check#Errors.Empty) or [check.Errors.NotEmpty](https://godoc.org/github.com/gowww/check#Errors.NotEmpty) to know if there are errors and handle them like you want.  
+You can also translate error messages with [Context.TErrors](https://godoc.org/github.com/gowww/app#Context.TErrors):
 
-	```Go
-	if errs.NotEmpty() {
-		c.Status(http.StatusBadRequest)
-		c.View(view, app.ViewData{"errors": c.TErrors(errs)})
-		return
-	}
-	```
+```Go
+if errs.NotEmpty() {
+	c.Status(http.StatusBadRequest)
+	c.View(view, app.ViewData{"errors": c.TErrors(errs)})
+	return
+}
+```
 
-Usually, when a check fails, you just want to send a response with error messages.  
+But usually, when a check fails, you only want to send a response with error messages.  
 Here comes the [BadRequest](https://godoc.org/github.com/gowww/app#BadRequest) shortcut which receives a checker and a view name.  
 If you don't provide a view name (empty string), the response will be a JSON errors map.
 
-If the check fails, it sets the status to "400 Bad Request" and returns `true`, allowing you to exit from the handler:
+If the check fails, it sets the status to "400 Bad Request", sends the response (view or JSON) and returns `true`, allowing you to exit from the handler:
 
 ```Go
 app.Post("/join", func(c *app.Context) {
 	if c.BadRequest(userChecker, "join") {
 		return
 	}
-	c.Redirect("/user", http.StatusSeeOther)
+	// Handle request confidently.
 })
 ```
 
-In views, you can retrive translated errors under key `errors` which is always present, even if the errors map is empty:
+In views, you can retrive the [check.TranslatedErrors](https://godoc.org/github.com/gowww/check#TranslatedErrors) map under key `errors` which is never `nil` in view data:
 
 ```HTML
 <input type="email" name="email" value="{{.email}}">
@@ -413,31 +414,31 @@ In views, you can retrive translated errors under key `errors` which is always p
 
 Internationalization is handled by [gowww/i18n](https://godoc.org/github.com/gowww/i18n).
 
-1. Make a map for your translations (a map of string to string, for each language tag):
+Firstly, make your translations map (string to string, for each language):
 
-	```Go
-	locales := i18n.Locales{
-		language.English: {
-			"hello": "Hello!",
-		},
-		language.French: {
-			"hello": "Bonjour !",
-		},
-	}
-	```
+```Go
+locales := i18n.Locales{
+	language.English: {
+		"hello": "Hello!",
+	},
+	language.French: {
+		"hello": "Bonjour !",
+	},
+}
+```
 
-2. Use [Localize](https://godoc.org/github.com/gowww/app#Localize) to register them with the default locale (used for fallback):
+Use [Localize](https://godoc.org/github.com/gowww/app#Localize) to register it and set the default locale (used as a fallback):
 
-	```Go
-	app.Localize(locales, language.English)
-	```
+```Go
+app.Localize(locales, language.English)
+```
 
-3. Methods [Context.T](https://godoc.org/github.com/gowww/app#Context.T), [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn), [Context.THTML](https://godoc.org/github.com/gowww/app#Context.THTML) and [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML) are now operational.  
-   As the [Context](https://godoc.org/github.com/gowww/app#Context) is always part of the view data, you can use these methods in views:
+Methods [Context.T](https://godoc.org/github.com/gowww/app#Context.T), [Context.Tn](https://godoc.org/github.com/gowww/app#Context.Tn), [Context.THTML](https://godoc.org/github.com/gowww/app#Context.THTML) and [Context.TnHTML](https://godoc.org/github.com/gowww/app#Context.TnHTML) are now operational.  
+As the [Context](https://godoc.org/github.com/gowww/app#Context) is always part of the view data, you can use these methods in views:
 
-	```HTML
-	<h1>{{.c.T "hello"}}</h1>
-	```
+```HTML
+<h1>{{.c.T "hello"}}</h1>
+```
 
 ## Static files
 
