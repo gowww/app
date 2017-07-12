@@ -493,5 +493,6 @@ First handler wraps the second and so on.
 <a href="https://travis-ci.org/gowww/app"><img src="https://travis-ci.org/gowww/app.svg?branch=master" alt="Build"></a>
 <a href="https://coveralls.io/github/gowww/app?branch=master"><img src="https://coveralls.io/repos/github/gowww/app/badge.svg?branch=master" alt="Coverage"></a>
 <a href="https://goreportcard.com/report/github.com/gowww/app"><img src="https://goreportcard.com/badge/github.com/gowww/app" alt="Go Report"></a>
+<img src="https://img.shields.io/badge/status-unstable-red.svg" alt="Status Unstable">
 <br><br>
 </p>
