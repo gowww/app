@@ -251,7 +251,7 @@ func (c *Context) Cookie(name string) string {
 // If the secret key is set for app, value will be encrypted.
 // If the app is not in a production environment, the "secure" flag will be set to false.
 func (c *Context) SetCookie(cookie *http.Cookie) {
-	if !*production {
+	if !production {
 		cookie.Secure = false
 	}
 	if encrypter != nil {
@@ -269,13 +269,23 @@ func (c *Context) DeleteCookie(name string) {
 	http.SetCookie(c.Res, &http.Cookie{Name: name, MaxAge: -1})
 }
 
-// T returns the translation associated to key, for the client locale.
-func (c *Context) T(key string, a ...interface{}) string {
+// translator returns the request translator.
+func (c *Context) translator() *i18n.Translator {
 	rt := i18n.RequestTranslator(c.Req)
 	if rt == nil {
-		return fmt.Sprintf("[%v]", key)
+		panic("app: no locales, no translator set")
 	}
-	return rt.T(key, a...)
+	return rt
+}
+
+// Locale returns the locale used for the client.
+func (c *Context) Locale() language.Tag {
+	return c.translator().Locale()
+}
+
+// T returns the translation associated to key, for the client locale.
+func (c *Context) T(key string, a ...interface{}) string {
+	return c.translator().T(key, a...)
 }
 
 // Tn returns the translation associated to key, for the client locale.
@@ -283,38 +293,22 @@ func (c *Context) T(key string, a ...interface{}) string {
 // All i18n.TnPlaceholder in the translation are replaced with number n.
 // If translation is not found, an empty string is returned.
 func (c *Context) Tn(key string, n int, args ...interface{}) string {
-	rt := i18n.RequestTranslator(c.Req)
-	if rt == nil {
-		return fmt.Sprintf("[%v]", key)
-	}
-	return rt.Tn(key, n, args...)
+	return c.translator().Tn(key, n, args...)
 }
 
 // THTML works like T but returns an HTML unescaped translation. An "nl2br" function is applied to the result.
 func (c *Context) THTML(key string, a ...interface{}) template.HTML {
-	rt := i18n.RequestTranslator(c.Req)
-	if rt == nil {
-		return template.HTML(fmt.Sprintf("[%v]", key))
-	}
-	return rt.THTML(key, a...)
+	return c.translator().THTML(key, a...)
 }
 
 // TnHTML works like Tn but returns an HTML unescaped translation. An "nl2br" function is applied to the result.
 func (c *Context) TnHTML(key string, n int, args ...interface{}) template.HTML {
-	rt := i18n.RequestTranslator(c.Req)
-	if rt == nil {
-		return template.HTML(fmt.Sprintf("[%v]", key))
-	}
-	return rt.TnHTML(key, n, args...)
+	return c.translator().TnHTML(key, n, args...)
 }
 
 // FmtNumber returns a formatted number with decimal and thousands marks.
 func (c *Context) FmtNumber(n interface{}) string {
-	rt := i18n.RequestTranslator(c.Req)
-	if rt == nil {
-		return i18n.FmtNumber(language.English, n)
-	}
-	return i18n.FmtNumber(rt.Locale(), n)
+	return i18n.FmtNumber(c.translator().Locale(), n)
 }
 
 // Push initiates an HTTP/2 server push if supported.
