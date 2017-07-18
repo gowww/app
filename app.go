@@ -3,13 +3,13 @@ package app
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 
+	"github.com/gowww/cli"
 	"github.com/gowww/compress"
 	"github.com/gowww/crypto"
 	"github.com/gowww/fatal"
@@ -24,13 +24,14 @@ var (
 	encrypter       crypto.Encrypter
 	securityOptions *secure.Options
 
-	address    = flag.String("a", ":8080", "The address to listen and serve on.")
-	production = flag.Bool("p", false, "Run the server in production environment.")
+	address    string
+	production bool
 	rt         = router.New()
 )
 
 func init() {
-	flag.Parse()
+	cli.String(&address, "a", ":8080", "The address to listen and serve on.")
+	cli.Bool(&production, "p", false, "Run the server in production environment.")
 
 	// Serve static content.
 	rt.Get("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
@@ -107,7 +108,6 @@ func Secure(o *secure.Options) {
 	if encrypter != nil {
 		panic("app: security options set multiple times")
 	}
-	o.EnvDevelopment = !*production
 	securityOptions = o
 }
 
@@ -133,17 +133,29 @@ func Encrypter() crypto.Encrypter {
 }
 
 // EnvProduction tells if the app is run with the production flag.
+// It ensures that flags are parsed so don't use this function before setting your own flags with gowww/cli or they will be ignored.
 func EnvProduction() bool {
-	return *production
+	if !cli.Parsed() {
+		cli.Parse()
+	}
+	return production
 }
 
 // Address gives the address on which the app is running.
+// It ensures that flags are parsed so don't use this function before setting your own flags with gowww/cli or they will be ignored.
 func Address() string {
-	return *address
+	if !cli.Parsed() {
+		cli.Parse()
+	}
+	return address
 }
 
-// Run starts the server.
+// Run ensures that flags are parsed, sets the middlewares and starts the server.
 func Run(mm ...Middleware) {
+	if !cli.Parsed() {
+		cli.Parse()
+	}
+
 	initViews()
 
 	handler := wrapHandler(rt, mm...)
@@ -151,9 +163,10 @@ func Run(mm ...Middleware) {
 
 	// gowww/secure
 	if securityOptions != nil {
+		securityOptions.EnvDevelopment = !production
 		handler = secure.Handle(handler, securityOptions)
 	} else {
-		handler = secure.Handle(handler, &secure.Options{EnvDevelopment: !*production})
+		handler = secure.Handle(handler, &secure.Options{EnvDevelopment: !production})
 	}
 
 	// gowww/fatal
@@ -174,14 +187,14 @@ func Run(mm ...Middleware) {
 	handler = compress.Handle(handler)
 
 	// gowww/log
-	if !*production {
+	if !production {
 		handler = gowwwlog.Handle(handler, &gowwwlog.Options{Color: true})
 	}
 
 	// Wait for shut down.
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
-	srv := &http.Server{Addr: *address, Handler: handler}
+	srv := &http.Server{Addr: address, Handler: handler}
 	go func() {
 		<-quit
 		log.Println("Shutting down...")
@@ -190,7 +203,7 @@ func Run(mm ...Middleware) {
 		}
 	}()
 
-	log.Printf("Running on %v", *address)
+	log.Printf("Running on %v", address)
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatal(err)
 	}

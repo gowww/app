@@ -32,7 +32,7 @@ func initViews() {
 	}
 
 	view.AllHelpers["envproduction"] = func() bool {
-		return EnvProduction()
+		return production
 	}
 
 	views.Funcs(view.AllHelpers).ParseDir(viewsDir)
