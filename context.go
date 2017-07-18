@@ -19,12 +19,6 @@ import (
 
 type responseType int
 
-// Response content types.
-const (
-	HTML responseType = iota
-	JSON
-)
-
 // A Context contains the data for a handler.
 type Context struct {
 	Res http.ResponseWriter
@@ -310,6 +304,8 @@ func (c *Context) TnHTML(key string, n int, args ...interface{}) template.HTML {
 func (c *Context) FmtNumber(n interface{}) string {
 	return i18n.FmtNumber(c.translator().Locale(), n)
 }
+
+// TODO: HTML link helper with i18n. See https://support.google.com/webmasters/answer/189077?hl=en.
 
 // Push initiates an HTTP/2 server push if supported.
 // See net/http.Pusher for documentation.
