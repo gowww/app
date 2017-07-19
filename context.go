@@ -17,8 +17,6 @@ import (
 	"github.com/gowww/router"
 )
 
-type responseType int
-
 // A Context contains the data for a handler.
 type Context struct {
 	Res http.ResponseWriter

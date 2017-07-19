@@ -41,7 +41,7 @@ func init() {
 type Handler func(*Context)
 
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h(&Context{w, r})
+	h(&Context{Res: w, Req: r})
 }
 
 // A Middleware is a handler that wraps another one.
