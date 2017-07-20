@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	flagBuildDocker bool
-	flagBuildName   string
+	flagBuildDocker  bool
+	flagBuildName    string
+	flagKeygenNumber int
 
 	watcher     *fsnotify.Watcher
 	runningProc *os.Process
@@ -31,7 +32,8 @@ func main() {
 		Bool(&flagBuildDocker, "docker", false, `Use Docker's "golang:latest" image to build for Linux.`).
 		String(&flagBuildName, "name", getwd(false), "The file name used for build.")
 
-	cli.Command("keygen", keygen, "Print a 32 btes generated key.")
+	cli.Command("keygen", keygen, "Print a 32 btes generated key.").
+		Int(&flagKeygenNumber, "n", 1, "The number of generated keys.")
 
 	cli.Command("watch", watch, "Detect changes and rerun app.")
 
@@ -56,7 +58,9 @@ func run() {
 }
 
 func keygen() {
-	fmt.Println(crypto.RandomKey())
+	for i := 0; i < flagKeygenNumber; i++ {
+		fmt.Println(crypto.RandomKey())
+	}
 }
 
 func clean() {
