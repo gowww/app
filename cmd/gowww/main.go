@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/gowww/cli"
+	"github.com/gowww/crypto"
 )
 
 var (
@@ -28,6 +30,8 @@ func main() {
 	cli.Command("build", build, "Create binary for app.").
 		Bool(&flagBuildDocker, "docker", false, `Use Docker's "golang:latest" image to build for Linux.`).
 		String(&flagBuildName, "name", getwd(false), "The file name used for build.")
+
+	cli.Command("keygen", keygen, "Print a 32 btes generated key.")
 
 	cli.Command("watch", watch, "Detect changes and rerun app.")
 
@@ -49,6 +53,10 @@ func run() {
 		panic(err)
 	}
 	runningProc = cmd.Process
+}
+
+func keygen() {
+	fmt.Println(crypto.RandomKey())
 }
 
 func clean() {
