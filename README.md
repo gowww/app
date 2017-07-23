@@ -21,7 +21,7 @@ It greatly increases productivity by providing helpers at all levels while maint
 	- [Data](#data)
 		- [Built-in](#built-in)
 	- [Functions](#functions)
-		- [Built-in](#built-in)
+		- [Built-in](#built-in-1)
 - [Validation](#validation)
 - [Internationalization](#internationalization)
 - [Static files](#static-files)
