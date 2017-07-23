@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net"
 	"net/http"
 
@@ -320,6 +321,11 @@ func (c *Context) NotFound() {
 	} else {
 		http.NotFound(c.Res, c.Req)
 	}
+}
+
+// Log logs the message with the client address.
+func (c *Context) Log(msg string) {
+	log.Printf("Serving %s: %s", c.Req.RemoteAddr, msg)
 }
 
 // Panic logs error with stack trace and responds with the error handler if set.
