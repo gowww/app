@@ -372,7 +372,7 @@ Firstly, make a [Checker](https://godoc.org/github.com/gowww/check#Checker) with
 userChecker := check.Checker{
 	"email":   {check.Required, check.Email, check.Unique(db, "users", "email", "?")},
 	"phone":   {check.Phone},
-	"picture": {check.MaxFileSize(5000), check.Image},
+	"picture": {check.MaxFileSize(5000000), check.Image},
 }
 ```
 
