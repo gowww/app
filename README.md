@@ -320,11 +320,13 @@ In *views/home.gohtml*:
 
 #### Built-in
 
+This data is always passed to the views, out of the box:
+
 Data             | Description
 -----------------|--------------------------------------------------
-`.c`             | The [Context](https://godoc.org/github.com/gowww/app#Context).
+`.c`             | The current [Context](https://godoc.org/github.com/gowww/app#Context).
 `.envProduction` | Tells if the app is run with the production flag.
-`.errors`        | See [Validation](#validation).
+`.errors`        | See [validation](#validation).
 
 ### Functions
 
