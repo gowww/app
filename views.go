@@ -31,9 +31,9 @@ func initViews() {
 		return
 	}
 
-	view.AllHelpers["envproduction"] = func() bool {
-		return production
-	}
+	GlobalViewData(ViewData{
+		"envProduction": production,
+	})
 
 	views.Funcs(view.AllHelpers).ParseDir(viewsDir)
 }
