@@ -19,8 +19,9 @@ It greatly increases productivity by providing helpers at all levels while maint
 	- [Values](#values)
 - [Views](#views)
 	- [Data](#data)
+		- [Built-in](#built-in)
 	- [Functions](#functions)
-	- [Built-in](#built-in)
+		- [Built-in](#built-in)
 - [Validation](#validation)
 - [Internationalization](#internationalization)
 - [Static files](#static-files)
@@ -289,8 +290,7 @@ app.Get("/", func(c *app.Context) {
 
 ### Data
 
-Use a [ViewData](https://godoc.org/github.com/gowww/app#ViewData) map to pass data to a view.  
-Note that the [Context](https://godoc.org/github.com/gowww/app#Context) is automatically stored in the view data under key `c`.
+Use a [ViewData](https://godoc.org/github.com/gowww/app#ViewData) map to pass data to a view.
 
 You can also use [GlobalViewData](https://godoc.org/github.com/gowww/app#GlobalViewData) to set data for all views:
 
@@ -318,6 +318,14 @@ In *views/home.gohtml*:
 {{end}}
 ```
 
+#### Built-in
+
+Data             | Description
+-----------------|--------------------------------------------------
+`.c`             | The [Context](https://godoc.org/github.com/gowww/app#Context).
+`.envProduction` | Tells if the app is run with the production flag.
+`.errors`        | See [Validation](#validation).
+
 ### Functions
 
 Use [GlobalViewFuncs](https://godoc.org/github.com/gowww/app#GlobalViewFuncs) to set functions for all views:
@@ -344,13 +352,12 @@ In *views/posts.gohtml*:
 
 In addition to the functions provided by the standard [template](https://golang.org/pkg/text/template/#hdr-Functions) package, these function are also available out of the box:
 
-Function        | Description                                                                                      | Usage                                             
+Function        | Description                                                                                      | Usage
 ----------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------
-`envproduction` | Tells if the app is run with the production flag.                                                | `{{if envproduction}}Live{{else}}Testing{{end}}`  
-`googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`   
-`nl2br`         | Converts `\n` to HTML `<br>`.                                                                    | `{{nl2br "line one\nline two"}}`                  
-`safehtml`      | Prevents string to be escaped. Be careful.                                                       | `{{safehtml "<strong>word</strong>"}}`            
-`scripts`       | Sets HTML script tags for the given script sources.                                              | `{{scripts "/static/main.js" "/static/user.js"}}` 
+`googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`
+`nl2br`         | Converts `\n` to HTML `<br>`.                                                                    | `{{nl2br "line one\nline two"}}`
+`safehtml`      | Prevents string to be escaped. Be careful.                                                       | `{{safehtml "<strong>word</strong>"}}`
+`scripts`       | Sets HTML script tags for the given script sources.                                              | `{{scripts "/static/main.js" "/static/user.js"}}`
 `styles`        | Sets HTML link tags for the given stylesheets.                                                   | `{{styles "/static/main.css" "/static/user.css"}}`
 
 ## Validation
