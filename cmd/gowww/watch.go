@@ -78,7 +78,14 @@ func watchEvent(e fsnotify.Event) {
 		!strings.Contains(e.Name, "partial") &&
 		filepath.Base(e.Name)[0] != '_' {
 		if strings.HasSuffix(e.Name, ".styl") {
-			buildStylesStylus(e.Name)
+			if !eventIs(e, fsnotify.Write) {
+				name := filepath.Base(e.Name)
+				name = strings.TrimSuffix(name, filepath.Ext(name))
+				os.Remove("static/styles/" + name + ".css")
+				os.Remove("static/styles/" + name + ".css.map")
+			} else {
+				buildStylesStylus(e.Name)
+			}
 		}
 		// TODO: LESS, SASS, SCSS...
 	} else if strings.HasPrefix(e.Name, "views/") {
