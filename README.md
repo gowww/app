@@ -354,13 +354,14 @@ In *views/posts.gohtml*:
 
 In addition to the functions provided by the standard [template](https://golang.org/pkg/text/template/#hdr-Functions) package, these function are also available out of the box:
 
-Function        | Description                                                                                      | Usage
-----------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------
-`googlefonts`   | Sets an HTML link to [Google Fonts](https://fonts.google.com)'s stylesheet of the given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`
-`nl2br`         | Converts `\n` to HTML `<br>`.                                                                    | `{{nl2br "line one\nline two"}}`
-`safehtml`      | Prevents string to be escaped. Be careful.                                                       | `{{safehtml "<strong>word</strong>"}}`
-`scripts`       | Sets HTML script tags for the given script sources.                                              | `{{scripts "/static/main.js" "/static/user.js"}}`
-`styles`        | Sets HTML link tags for the given stylesheets.                                                   | `{{styles "/static/main.css" "/static/user.css"}}`
+Function      | Description                                                                              | Usage
+--------------|------------------------------------------------------------------------------------------|------------------------------------------------
+`asset`       | Appends the file hash to the name of a static file from the `static` directory.          | `{{asset "videos/loop.mp4"}}`
+`googlefonts` | Sets HTML tag for [Google Fonts](https://fonts.google.com) stylesheet and given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`
+`nl2br`       | Converts `\n` to HTML `<br>`.                                                            | `{{nl2br "line one\nline two"}}`
+`safehtml`    | Prevents string to be escaped. Be careful.                                               | `{{safehtml "<strong>word</strong>"}}`
+`script`      | Sets HTML tag for a script from the `static/script` directory.                           | `{{script "main.js"}}`
+`style`       | Sets HTML tag for a stylesheet from the `static/style` directory.                        | `{{style "main.css"}}`
 
 ## Validation
 

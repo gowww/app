@@ -1,14 +1,23 @@
 package app
 
 import (
+	"html/template"
 	"os"
+	"strings"
 
+	"github.com/gowww/static"
 	"github.com/gowww/view"
 )
 
-const viewsDir = "views"
+const (
+	viewsDir  = "views"
+	staticDir = "static"
+)
 
-var views = view.New()
+var (
+	staticHandler = static.Handle("/"+staticDir+"/", staticDir)
+	views         = view.New()
+)
 
 // ViewData represents data for a view rendering.
 type ViewData map[string]interface{}
@@ -35,7 +44,19 @@ func initViews() {
 		"envProduction": production,
 	})
 
-	views.Funcs(view.AllHelpers).ParseDir(viewsDir)
+	GlobalViewFuncs(ViewFuncs{
+		"asset": func(path string) string {
+			return staticHandler.Hash(path)
+		},
+		"script": func(src string) template.HTML {
+			return view.HelperScript(staticHandler.Hash("scripts/" + strings.TrimPrefix(src, "/")))
+		},
+		"style": func(href string) template.HTML {
+			return view.HelperStyle(staticHandler.Hash("styles/" + strings.TrimPrefix(href, "/")))
+		},
+	})
+
+	views.ParseDir(viewsDir)
 }
 
 func mergeViewData(dd []ViewData) view.Data {
