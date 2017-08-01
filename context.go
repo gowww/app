@@ -33,6 +33,7 @@ func contextHandle(h http.Handler) http.Handler {
 				c.Res.WriteHeader(cw.status)
 			}
 		}()
+		cw.Header().Set("Cache-Control", "no-cache")
 		cw.Header().Set("Connection", "keep-alive")
 		h.ServeHTTP(cw, c.Req)
 	})

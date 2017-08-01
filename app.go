@@ -33,8 +33,8 @@ func init() {
 	cli.String(&address, "a", ":8080", "The address to listen and serve on.")
 	cli.Bool(&production, "p", false, "Run the server in production environment.")
 
-	// Serve static content.
-	rt.Get("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	// Set route for static content.
+	rt.Get("/"+staticDir+"/", staticHandler)
 }
 
 // A Handler handles a request.
