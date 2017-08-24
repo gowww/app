@@ -151,7 +151,7 @@ The app is also recovered from panics so you can set a custom "serving error" ha
 ```Go
 app.Error(func(c *app.Context) {
 	c.Status(http.StatusInternalServerError)
-	if c.Error() == ErrCannotOpenFile" {
+	if c.Error() == ErrCannotOpenFile {
 		c.View("errorStorage")
 		return
 	}
