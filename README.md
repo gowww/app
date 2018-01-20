@@ -121,16 +121,16 @@ A routing group works like the top-level router but prefixes all subroute paths:
 ```Go
 api := app.Group("/api")
 {
-	v1 := app.Group("/v1")
+	v1 := api.Group("/v1")
 	{
-		v1.Get("/user", func(c *app.Context) { // Write response for GET /api/v1/user })
-		v1.Get("/item", func(c *app.Context) { // Write response for GET /api/v1/item })
+		v1.Get("/user", func(c *app.Context) { /* Write response for GET /api/v1/user */ })
+		v1.Get("/item", func(c *app.Context) { /* Write response for GET /api/v1/item */ })
 	}
 
-	v2 := app.Group("/v2")
+	v2 := api.Group("/v2")
 	{
-		v2.Get("/user", func(c *app.Context) { // Write response for GET /api/v2/user })
-		v2.Get("/item", func(c *app.Context) { // Write response for GET /api/v2/item })
+		v2.Get("/user", func(c *app.Context) { /* Write response for GET /api/v2/user */ })
+		v2.Get("/item", func(c *app.Context) { /* Write response for GET /api/v2/item */ })
 	}
 }
 ```
