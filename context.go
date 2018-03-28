@@ -143,8 +143,9 @@ func (c *Context) Bytes(b []byte) {
 }
 
 // Status sets the HTTP status of the response.
-func (c *Context) Status(code int) {
+func (c *Context) Status(code int) *Context {
 	c.Res.WriteHeader(code)
+	return c
 }
 
 // View writes the response with a rendered view.
