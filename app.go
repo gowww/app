@@ -105,7 +105,7 @@ func Error(handler Handler) {
 
 // Secure sets security options.
 func Secure(o *secure.Options) {
-	if encrypter != nil {
+	if securityOptions != nil {
 		panic("app: security options set multiple times")
 	}
 	securityOptions = o
