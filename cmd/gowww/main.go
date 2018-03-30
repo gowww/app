@@ -13,6 +13,12 @@ import (
 	"github.com/gowww/crypto"
 )
 
+const (
+	dirScripts = "scripts"
+	dirStyles  = "styles"
+	dirViews   = "views"
+)
+
 var (
 	flagBuildDocker  bool
 	flagBuildName    string
