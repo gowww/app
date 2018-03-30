@@ -391,7 +391,7 @@ You can also translate error messages with [Context.TErrors](https://godoc.org/g
 ```Go
 if errs.NotEmpty() {
 	c.Status(http.StatusBadRequest)
-	c.View(view, app.ViewData{"errors": c.TErrors(errs)})
+	c.View(view, app.ViewData{"errors": errs})
 	return
 }
 ```
