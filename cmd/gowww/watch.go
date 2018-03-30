@@ -89,9 +89,7 @@ func watchEvent(e fsnotify.Event) {
 			if strings.HasSuffix(e.Name, "_test.go") || !packageIsMain(e.Name) {
 				return
 			}
-			outFile := filepath.Dir(strings.TrimPrefix(e.Name, dirScripts+"/"))
-			outFile += "/main.js"
-			buildScriptsGopherJS(e.Name, outFile)
+			buildScriptsGopherJS(e.Name)
 			return
 		}
 
@@ -118,11 +116,10 @@ func watchEvent(e fsnotify.Event) {
 
 		// Stylus
 		if strings.HasSuffix(e.Name, ".styl") {
-			outFile := strings.TrimPrefix(e.Name, dirStyles+"/")
 			if eventIs(e, fsnotify.Write) {
-				buildStylesStylus(e.Name, filepath.Dir(outFile))
+				buildStylesStylus(e.Name)
 			} else {
-				outFile = filepath.Join("static/styles", strings.TrimSuffix(outFile, filepath.Ext(outFile)))
+				outFile := filepath.Join("static", strings.TrimSuffix(e.Name, filepath.Ext(e.Name)))
 				os.Remove(outFile + ".css")
 				os.Remove(outFile + ".css.map")
 			}
@@ -155,7 +152,7 @@ func watchEvent(e fsnotify.Event) {
 func packageIsMain(file string) bool {
 	f, err := os.Open(file)
 	if err != nil {
-		panic(err)
+		return false
 	}
 	defer f.Close()
 
