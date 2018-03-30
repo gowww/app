@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,15 +19,15 @@ func initWatcher() {
 		panic(err)
 	}
 	watcher.Add(".")
-	watcherAddRecur("scripts")
-	watcherAddRecur("styles")
-	watcherAddRecur("views")
+	watcherAddRecur(dirScripts)
+	watcherAddRecur(dirStyles)
+	watcherAddRecur(dirViews)
 }
 
 // watcherAddRecur adds a directory and its subdirectories to the watcher.
 func watcherAddRecur(dir string) {
 	if watcher.Add(dir) == nil {
-		filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
+		err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
@@ -35,6 +36,9 @@ func watcherAddRecur(dir string) {
 			}
 			return watcher.Add(path)
 		})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -77,15 +81,17 @@ func watchEvent(e fsnotify.Event) {
 		return
 	}
 
-	if strings.HasPrefix(e.Name, "scripts/") {
+	if strings.HasPrefix(e.Name, dirScripts+"/") {
 		watcherAddCreated(e)
 
 		// GopherJS
 		if strings.HasSuffix(e.Name, ".go") {
-			if strings.HasSuffix(e.Name, "_test.go") {
+			if strings.HasSuffix(e.Name, "_test.go") || !packageIsMain(e.Name) {
 				return
 			}
-			buildScriptsGopherJS()
+			outFile := filepath.Dir(strings.TrimPrefix(e.Name, dirScripts+"/"))
+			outFile += "/main.js"
+			buildScriptsGopherJS(e.Name, outFile)
 			return
 		}
 
@@ -93,7 +99,7 @@ func watchEvent(e fsnotify.Event) {
 		return
 	}
 
-	if strings.HasPrefix(e.Name, "styles/") {
+	if strings.HasPrefix(e.Name, dirStyles+"/") {
 		if strings.Contains(e.Name, "mixin") || strings.Contains(e.Name, "partial") || filepath.Base(e.Name)[0] == '_' {
 			return
 		}
@@ -107,8 +113,8 @@ func watchEvent(e fsnotify.Event) {
 			}
 			name := filepath.Base(e.Name)
 			name = strings.TrimSuffix(name, filepath.Ext(name))
-			os.Remove("static/styles/" + name + ".css")
-			os.Remove("static/styles/" + name + ".css.map")
+			os.Remove("static/" + dirStyles + "/" + name + ".css")
+			os.Remove("static/" + dirStyles + "/" + name + ".css.map")
 			return
 		}
 
@@ -116,7 +122,7 @@ func watchEvent(e fsnotify.Event) {
 		return
 	}
 
-	if strings.HasPrefix(e.Name, "views/") {
+	if strings.HasPrefix(e.Name, dirViews+"/") {
 		watcherAddCreated(e)
 		run()
 		return
@@ -132,4 +138,21 @@ func watchEvent(e fsnotify.Event) {
 		}
 		return
 	}
+}
+
+// packageIsMain checks that package defined in Go file is "main".
+func packageIsMain(file string) bool {
+	f, err := os.Open(file)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if scanner.Text() == "package main" {
+			return true
+		}
+	}
+	return false
 }

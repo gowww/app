@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"github.com/gowww/cli"
@@ -54,9 +55,9 @@ func buildDocker() error {
 		"docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+flagBuildName, "-w", "/go/src/"+flagBuildName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
 }
 
-func buildScriptsGopherJS() error {
+func buildScriptsGopherJS(dir, outFile string) error {
 	return buildExec("Building scripts with GopherJS...",
-		"gopherjs", "build", "./scripts", "--output", "static/scripts/main.js", "--minify")
+		"gopherjs", "build", "./"+dir, "--output", filepath.Join("static/scripts/", outFile), "--minify")
 }
 
 func buildStylesStylus(file string) error {
