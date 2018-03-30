@@ -9,6 +9,7 @@ type RouterGroup struct {
 }
 
 // Group initiates a routing group.
+// All subroutes paths will be prefixed with the group path.
 func Group(path string, middlewares ...Middleware) *RouterGroup {
 	return &RouterGroup{path, middlewares}
 }
@@ -20,9 +21,6 @@ func (rg *RouterGroup) Group(path string, middlewares ...Middleware) *RouterGrou
 
 // Route makes a route for method and path.
 func (rg *RouterGroup) Route(method, path string, handler Handler, middlewares ...Middleware) {
-	if path == "/" {
-		path = ""
-	}
 	rt.Handle(method, rg.path+path, wrapHandler(wrapHandler(handler, middlewares...), rg.middlewares...))
 }
 
