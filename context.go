@@ -211,7 +211,7 @@ func (c *Context) BadRequest(checker check.Checker, view string, data ...ViewDat
 	if view == "" {
 		c.JSON(errs)
 	} else {
-		data = append(data, ViewData{"errors": c.TErrors(errs)})
+		data = append(data, ViewData{"errors": errs})
 		c.View(view, data...)
 	}
 	return true
