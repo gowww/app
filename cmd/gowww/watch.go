@@ -81,36 +81,55 @@ func watchEvent(e fsnotify.Event) {
 		watcherAddCreated(e)
 
 		// GopherJS
-		if strings.HasSuffix(e.Name, ".go") && !strings.HasSuffix(e.Name, "_test.go") {
+		if strings.HasSuffix(e.Name, ".go") {
+			if strings.HasSuffix(e.Name, "_test.go") {
+				return
+			}
 			buildScriptsGopherJS()
+			return
 		}
 
 		// TODO: Babel, CoffeeScript, TypeScript...
-	} else if strings.HasPrefix(e.Name, "styles/") &&
-		!strings.Contains(e.Name, "mixin") &&
-		!strings.Contains(e.Name, "partial") &&
-		filepath.Base(e.Name)[0] != '_' {
+		return
+	}
+
+	if strings.HasPrefix(e.Name, "styles/") {
+		if strings.Contains(e.Name, "mixin") || strings.Contains(e.Name, "partial") || filepath.Base(e.Name)[0] == '_' {
+			return
+		}
 		watcherAddCreated(e)
 
 		// Stylus
 		if strings.HasSuffix(e.Name, ".styl") {
-			if !eventIs(e, fsnotify.Write) {
-				name := filepath.Base(e.Name)
-				name = strings.TrimSuffix(name, filepath.Ext(name))
-				os.Remove("static/styles/" + name + ".css")
-				os.Remove("static/styles/" + name + ".css.map")
-			} else {
+			if eventIs(e, fsnotify.Write) {
 				buildStylesStylus(e.Name)
+				return
 			}
+			name := filepath.Base(e.Name)
+			name = strings.TrimSuffix(name, filepath.Ext(name))
+			os.Remove("static/styles/" + name + ".css")
+			os.Remove("static/styles/" + name + ".css.map")
+			return
 		}
 
 		// TODO: LESS, SASS, SCSS...
-	} else if strings.HasPrefix(e.Name, "views/") {
+		return
+	}
+
+	if strings.HasPrefix(e.Name, "views/") {
 		watcherAddCreated(e)
 		run()
-	} else if strings.HasSuffix(e.Name, ".go") && !strings.HasSuffix(e.Name, "_test.go") {
+		return
+	}
+
+	if strings.HasSuffix(e.Name, ".go") {
+		if strings.HasSuffix(e.Name, "_test.go") {
+			return
+		}
 		if buildGo() == nil {
 			run()
+			return
 		}
+		return
 	}
 }
