@@ -2,11 +2,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/gowww/cli"
 )
@@ -55,12 +57,22 @@ func buildDocker() error {
 		"docker", "run", "--rm", "-v", getwd(true)+":/go/src/"+flagBuildName, "-w", "/go/src/"+flagBuildName, "golang:latest", "sh", "-c", "go get . && go build -o "+buildName())
 }
 
-func buildScriptsGopherJS(dir, outFile string) error {
+func buildScriptsGopherJS(inDir, outFile string) error {
 	return buildExec("Building scripts with GopherJS...",
-		"gopherjs", "build", "./"+dir, "--output", filepath.Join("static/scripts/", outFile), "--minify")
+		"gopherjs", "build", "./"+inDir, "--output", filepath.Join("static/scripts", outFile), "--minify")
 }
 
-func buildStylesStylus(file string) error {
+func buildStylesSass(file string) error {
+	outFile := filepath.Join("static", strings.TrimSuffix(file, filepath.Ext(file))+".css")
+	fmt.Println(outFile)
+	os.MkdirAll(filepath.Dir(outFile), os.ModePerm)
+	return buildExec("Building styles with Sass...",
+		"sassc", file, outFile, "--sourcemap")
+}
+
+func buildStylesStylus(inFile, outDir string) error {
+	outDir = filepath.Join("static/styles", outDir)
+	os.MkdirAll(outDir, os.ModePerm)
 	return buildExec("Building styles with Stylus...",
-		"stylus", file, "--out", "static/styles", "--compress", "--sourcemap")
+		"stylus", inFile, "--out", outDir, "--compress", "--sourcemap")
 }

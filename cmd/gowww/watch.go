@@ -95,30 +95,41 @@ func watchEvent(e fsnotify.Event) {
 			return
 		}
 
-		// TODO: Babel, CoffeeScript, TypeScript...
+		// TODO: Babel, CoffeeScript, TypeScript
 		return
 	}
 
 	if strings.HasPrefix(e.Name, dirStyles+"/") {
+		watcherAddCreated(e)
 		if strings.Contains(e.Name, "mixin") || strings.Contains(e.Name, "partial") || filepath.Base(e.Name)[0] == '_' {
 			return
 		}
-		watcherAddCreated(e)
 
-		// Stylus
-		if strings.HasSuffix(e.Name, ".styl") {
+		if strings.HasSuffix(e.Name, ".sass") || strings.HasSuffix(e.Name, ".scss") {
 			if eventIs(e, fsnotify.Write) {
-				buildStylesStylus(e.Name)
-				return
+				buildStylesSass(e.Name)
+			} else {
+				outFile := filepath.Join("static", strings.TrimSuffix(e.Name, filepath.Ext(e.Name)))
+				os.Remove(outFile + ".css")
+				os.Remove(outFile + ".css.map")
 			}
-			name := filepath.Base(e.Name)
-			name = strings.TrimSuffix(name, filepath.Ext(name))
-			os.Remove("static/" + dirStyles + "/" + name + ".css")
-			os.Remove("static/" + dirStyles + "/" + name + ".css.map")
 			return
 		}
 
-		// TODO: LESS, SASS, SCSS...
+		// Stylus
+		if strings.HasSuffix(e.Name, ".styl") {
+			outFile := strings.TrimPrefix(e.Name, dirStyles+"/")
+			if eventIs(e, fsnotify.Write) {
+				buildStylesStylus(e.Name, filepath.Dir(outFile))
+			} else {
+				outFile = filepath.Join("static/styles", strings.TrimSuffix(outFile, filepath.Ext(outFile)))
+				os.Remove(outFile + ".css")
+				os.Remove(outFile + ".css.map")
+			}
+			return
+		}
+
+		// TODO: LESS
 		return
 	}
 
