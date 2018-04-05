@@ -65,7 +65,7 @@ func buildStylesSass(file string) error {
 	outFile := filepath.Join("static", strings.TrimSuffix(file, filepath.Ext(file))+".css")
 	os.MkdirAll(filepath.Dir(outFile), os.ModePerm)
 	return buildExec("Building styles with Sass...",
-		"sassc", file, outFile, "--sourcemap")
+		"sassc", file, outFile, "--sourcemap", "--style", "compressed")
 }
 
 func buildStylesStylus(file string) error {
