@@ -32,7 +32,7 @@ func main() {
 	defer clean()
 	atexit(clean)
 
-	cli.Description = "The CLI of the gowww/app framework."
+	cli.SetUsageText("The CLI of the gowww/app framework.")
 
 	cli.Command("build", build, "Create binary for app.").
 		Bool(&flagBuildDocker, "docker", false, `Use Docker's "golang:latest" image to build for Linux.`).
