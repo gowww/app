@@ -7,21 +7,21 @@ It greatly increases productivity by providing helpers at all levels while maint
 
 - [Start](#start)
 - [Routing](#routing)
-	- [Path parameters](#path-parameters)
-		- [Named](#named)
-		- [Regular expressions](#regular-expressions)
-		- [Wildcard](#wildcard)
-	- [Groups](#groups)
-	- [Errors](#errors)
+  - [Path parameters](#path-parameters)
+    - [Named](#named)
+    - [Regular expressions](#regular-expressions)
+    - [Wildcard](#wildcard)
+  - [Groups](#groups)
+  - [Errors](#errors)
 - [Context](#context)
-	- [Request](#request)
-	- [Response](#response)
-	- [Values](#values)
+  - [Request](#request)
+  - [Response](#response)
+  - [Values](#values)
 - [Views](#views)
-	- [Data](#data)
-		- [Built-in](#built-in)
-	- [Functions](#functions)
-		- [Built-in](#built-in-1)
+  - [Data](#data)
+    - [Built-in](#built-in)
+  - [Functions](#functions)
+    - [Built-in](#built-in-1)
 - [Validation](#validation)
 - [Internationalization](#internationalization)
 - [Static files](#static-files)
@@ -34,15 +34,15 @@ It greatly increases productivity by providing helpers at all levels while maint
 
 2. Install gowww/app:
 
-	```Shell
-	go get github.com/gowww/app
-	```
+   ```Shell
+   go get github.com/gowww/app
+   ```
 
 3. Import it in your new app:
 
-	```Go
-	import github.com/gowww/app
-	```
+   ```Go
+   import "github.com/gowww/app"
+   ```
 
 ## Routing
 
@@ -310,7 +310,7 @@ app.Get("/", func(c *app.Context) {
 })
 ```
 
-In *views/home.gohtml*:
+In _views/home.gohtml_:
 
 ```HTML
 {{define "home"}}
@@ -322,11 +322,11 @@ In *views/home.gohtml*:
 
 This data is always passed to the views, out of the box:
 
-Data             | Description
------------------|--------------------------------------------------
-`.c`             | The current [Context](https://godoc.org/github.com/gowww/app#Context).
-`.envProduction` | Tells if the app is run with the production flag.
-`.errors`        | See [validation](#validation).
+| Data             | Description                                                            |
+| ---------------- | ---------------------------------------------------------------------- |
+| `.c`             | The current [Context](https://godoc.org/github.com/gowww/app#Context). |
+| `.envProduction` | Tells if the app is run with the production flag.                      |
+| `.errors`        | See [validation](#validation).                                         |
 
 ### Functions
 
@@ -342,7 +342,7 @@ app.Get("/posts/new", func(c *app.Context) {
 })
 ```
 
-In *views/posts.gohtml*:
+In _views/posts.gohtml_:
 
 ```HTML
 {{define "postsNew"}}
@@ -354,14 +354,14 @@ In *views/posts.gohtml*:
 
 In addition to the functions provided by the standard [template](https://golang.org/pkg/text/template/#hdr-Functions) package, these function are also available out of the box:
 
-Function      | Description                                                                              | Usage
---------------|------------------------------------------------------------------------------------------|------------------------------------------------
-`asset`       | Appends the file hash to the name of a static file from the `static` directory.          | `{{asset "videos/loop.mp4"}}`
-`googlefonts` | Sets HTML tag for [Google Fonts](https://fonts.google.com) stylesheet and given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}`
-`nl2br`       | Converts `\n` to HTML `<br>`.                                                            | `{{nl2br "line one\nline two"}}`
-`safehtml`    | Prevents string to be escaped. Be careful.                                               | `{{safehtml "<strong>word</strong>"}}`
-`script`      | Sets HTML tag for a script from the `static/script` directory.                           | `{{script "main.js"}}`
-`style`       | Sets HTML tag for a stylesheet from the `static/style` directory.                        | `{{style "main.css"}}`
+| Function      | Description                                                                              | Usage                                           |
+| ------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `asset`       | Appends the file hash to the name of a static file from the `static` directory.          | `{{asset "videos/loop.mp4"}}`                   |
+| `googlefonts` | Sets HTML tag for [Google Fonts](https://fonts.google.com) stylesheet and given font(s). | `{{googlefonts "Open+Sans:400,700\|Spectral"}}` |
+| `nl2br`       | Converts `\n` to HTML `<br>`.                                                            | `{{nl2br "line one\nline two"}}`                |
+| `safehtml`    | Prevents string to be escaped. Be careful.                                               | `{{safehtml "<strong>word</strong>"}}`          |
+| `script`      | Sets HTML tag for a script from the `static/script` directory.                           | `{{script "main.js"}}`                          |
+| `style`       | Sets HTML tag for a stylesheet from the `static/style` directory.                        | `{{style "main.css"}}`                          |
 
 ## Validation
 
@@ -477,23 +477,23 @@ They can be set for:
 
 - The entire app:
 
-	```Go
-	app.Run(hand1, hand2, hand3)
-	```
+  ```Go
+  app.Run(hand1, hand2, hand3)
+  ```
 
 - A group:
 
-	```Go
-	api := app.Group("/api", hand1, hand2, hand3)
-	```
+  ```Go
+  api := app.Group("/api", hand1, hand2, hand3)
+  ```
 
 - A single route:
 
-	```Go
-	api := app.Get("/", func(c *app.Context) {
-		// Write response for GET /
-	}, hand1, hand2, hand3)
-	```
+  ```Go
+  api := app.Get("/", func(c *app.Context) {
+  	// Write response for GET /
+  }, hand1, hand2, hand3)
+  ```
 
 First handler wraps the second and so on.
 
