@@ -12,7 +12,7 @@ require (
 	github.com/gowww/i18n v1.0.0
 	github.com/gowww/log v1.0.0
 	github.com/gowww/router v1.0.0
-	github.com/gowww/secure v1.0.1
+	github.com/gowww/secure v1.0.2
 	github.com/gowww/static v1.0.0
 	github.com/gowww/view v1.0.0
 	golang.org/x/text v0.3.3
